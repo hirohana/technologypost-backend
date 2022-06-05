@@ -1,0 +1,5 @@
+SELECT
+  *
+FROM
+  article
+FOR UPDATE
