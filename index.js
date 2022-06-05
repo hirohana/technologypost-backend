@@ -7,7 +7,7 @@ const port = process.env.PORT || 3001;
 // app.use(cors());
 app.use(
   cors({
-    origin: "https://hirohana-frontend.herokuapp.com", //アクセス許可するオリジン
+    origin: "https://hirohana-frontend.herokuapp.com/", //アクセス許可するオリジン
     credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
     optionsSuccessStatus: 200, //レスポンスstatusを200に設定
   })
