@@ -1,0 +1,51 @@
+version: "3"
+services:
+  back:
+    build:
+      context: .
+      dockerfile: "Dockerfile"
+    environment:
+      - MYSQL_SERVER=db
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+      - TZ=${TZ}
+      - CHOKIDAR_USEPOLLING=true
+    tty: true
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/back
+      - node_modules_volume:/back/node_modules
+    # 起動時のカレントフォルダを指定
+    working_dir: /back
+    networks:
+      - network
+    depends_on:
+      - db
+  db:
+    build:
+      context: "."
+      dockerfile: "db.Dockerfile"
+    environment:
+      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - TZ=${TZ}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/conf:/etc/mysql/conf.d/:ro
+      - mysqldata:/var/lib/mysql
+      - ./db/logs:/var/log/mysql
+    networks:
+      - network
+
+networks:
+  network:
+
+volumes:
+  node_modules_volume:
+  mysqldata:
