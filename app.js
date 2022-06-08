@@ -1,20 +1,28 @@
 const express = require("express");
-const app = express();
+const cookie = require("cookie-parser");
+const session = require("express-session");
+const flash = require("connect-flash");
 const cors = require("cors");
 const gracefulShutdown = require("http-graceful-shutdown");
-const authGitHub = require("./lib/security/authGitHub.js");
 
+const app = express();
 const port = process.env.PORT || 5000;
 
 //set middleware
 app.set("view engine", "ejs");
 app.disable("x-powered-by");
 app.use(cors());
+app.use(cookie());
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(flash());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// initialize passport and express-session
-app.use(...authGitHub.initialize());
 
 // dynamic resource rooting
 app.use(
@@ -26,7 +34,7 @@ app.use(
       next();
     });
     router.use("/article", require("./routes/article/article.js"));
-    router.use("/auth", require("./routes/auth/auth.js"));
+    router.use("/account", require("./routes/account/account.js"));
     router.get("/api", (req, res) => {
       res.json({ message: "Hello API!" });
     });
@@ -46,6 +54,8 @@ app.use((err, req, res, next) => {
 const server = app.listen(port, () => {
   console.log(`listening on *:${port}`);
 });
+
+// graceful shutdown
 gracefulShutdown(server, {
   signals: "SIGINT SIGTERM",
   timeout: 10000,
