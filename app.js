@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const path = require("path");
 const cors = require("cors");
 const gracefulShutdown = require("http-graceful-shutdown");
 const authGitHub = require("./lib/security/authGitHub.js");

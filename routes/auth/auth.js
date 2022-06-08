@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { authenticate, callback } = require("../../lib/security/authGitHub.js");
 
 router.get("/github/callback", callback(), function (req, res) {
-  res.render("./github.ejs", { user: res.req.user });
+  res.json(res.req.user);
 });
 router.get("/github/login", authenticate(), function (req, res) {});
 router.get("/github/logout", function (req, res, next) {
