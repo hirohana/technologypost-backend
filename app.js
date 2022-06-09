@@ -33,8 +33,8 @@ app.use(
       res.setHeader("X-Frame-Options", "SAMEORIGIN");
       next();
     });
-    router.use("/article", require("./routes/article/article.js"));
     router.use("/account", require("./routes/account/account.js"));
+    router.use("/article", require("./routes/article/article.js"));
     router.get("/api", (req, res) => {
       res.json({ message: "Hello API!" });
     });
