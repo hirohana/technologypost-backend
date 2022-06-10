@@ -1,16 +1,17 @@
 const router = require("express").Router();
 const mysqlAPI = require("../../lib/database/mysqlAPI");
-const fs = require("fs");
-const { promisify } = require("util");
 
-const readFile = promisify(fs.readFile).bind(fs);
+const { PRIVILEGE } = require("../../lib/security/authPassport.js");
+const { authorization } = require("../../lib/utils/authorization.js");
+const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
+
 const databaseURL = "./lib/database/sql/article";
 
 router.get("/", async (req, res, next) => {
   try {
-    const queryString = await readFile(`${databaseURL}/SELECT_ARTICLE.sql`, {
-      encoding: "utf-8",
-    });
+    const queryString = await promisifyReadFile(
+      `${databaseURL}/SELECT_ARTICLE.sql`
+    );
     const results = await mysqlAPI.query(queryString);
     res.json(results);
   } catch (err) {
@@ -18,7 +19,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", authorization(PRIVILEGE.NORMAL), async (req, res, next) => {
   let transaction;
   const data = {
     userId: req.body.userId,
@@ -29,9 +30,9 @@ router.post("/", async (req, res, next) => {
 
   try {
     transaction = await mysqlAPI.beginTransaction();
-    const queryString = await readFile(`${databaseURL}/INSERT_ARTICLE.sql`, {
-      encoding: "utf-8",
-    });
+    const queryString = await promisifyReadFile(
+      `${databaseURL}/INSERT_ARTICLE.sql`
+    );
     await transaction.query(queryString, [
       data.userId,
       data.title,
