@@ -1,6 +1,6 @@
-const HOST = process.env.MYSQL_HOST || "db";
+const HOST = process.env.MYSQL_HOST || "127.0.0.1";
 const PORT = process.env.MYSQL_PORT || "3306";
-const USERNAME = process.env.MYSQL_USERNAME || "hirohana";
+const USERNAME = process.env.MYSQL_USERNAME || "admin";
 const PASSWORD = process.env.MYSQL_PASSWORD || "hanatubure";
 const DATABASE = process.env.MYSQL_DATABASE || "myportfolio";
 const CONNECTION_LIMIT = process.env.MYSQL_CONNECTION_LIMIT

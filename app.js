@@ -8,7 +8,7 @@ const gracefulShutdown = require("http-graceful-shutdown");
 const accesscontrol = require("./lib/security/authPassport.js");
 
 const app = express();
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 //set middleware
 app.set("view engine", "ejs");
