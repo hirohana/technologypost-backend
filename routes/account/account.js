@@ -14,4 +14,14 @@ router.get("/login/failure", (req, res, next) => {
 // ログイン認証処理(passportライブラリを使用)
 router.post("/login", authentication());
 
+// ログアウト処理
+router.post("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      res.json("ログアウト処理に失敗しました。");
+    }
+    res.json("ログアウトしました。");
+  });
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
 # usersのテーブル作成
 CREATE TABLE users(id int not null auto_increment primary key, 
-userId varchar(32) not null, username varchar(32) not null, email varchar(64) not null,password varchar(32) not null, 
+userId varchar(32) not null, username varchar(32) not null, email varchar(64) not null,password varchar(255) not null, 
 profile varchar(255), photoUrl varchar(255) not null, createdAt
 datetime not null);
 # usersのデータ挿入

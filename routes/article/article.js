@@ -7,6 +7,7 @@ const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 
 const databaseURL = "./lib/database/sql/article";
 
+// 記事を全て取得するAPI
 router.get("/", async (req, res, next) => {
   try {
     const queryString = await promisifyReadFile(
@@ -19,6 +20,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
 router.post("/", authorization(PRIVILEGE.NORMAL), async (req, res, next) => {
   let transaction;
   const data = {
