@@ -5,24 +5,31 @@ const flash = require("connect-flash");
 const cors = require("cors");
 const gracefulShutdown = require("http-graceful-shutdown");
 
+const accesscontrol = require("./lib/security/authPassport.js");
+
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 //set middleware
 app.set("view engine", "ejs");
 app.disable("x-powered-by");
+// 現在だれでもアクセスできる状態になってるのでデプロイ時には設定変更(引数にオプション)が必要
 app.use(cors());
 app.use(cookie());
 app.use(
   session({
+    cookie: {
+      secure: false,
+    },
     secret: "secret",
     resave: false,
     saveUninitialized: false,
   })
 );
-app.use(flash());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(flash());
+app.use(...accesscontrol.initialize());
 
 // dynamic resource rooting
 app.use(
