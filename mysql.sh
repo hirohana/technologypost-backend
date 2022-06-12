@@ -1,21 +1,43 @@
 # usersのテーブル作成
 CREATE TABLE users(id int not null auto_increment primary key, 
-userId varchar(32) not null, username varchar(32) not null, email varchar(64) not null,password varchar(255) not null, 
-profile varchar(255), photoUrl varchar(255) not null, createdAt
-datetime not null);
+username varchar(32) not null, email varchar(64) not null, password varchar(255) not null, 
+profile varchar(255), photoUrl varchar(255) not null, createdAt datetime not null);
 # usersのデータ挿入
-INSERT INTO users(userId, username, email, password, profile, photoUrl, createdAt)
-VALUES("1234", "Dummy", "dummy@gmail.com","abc", "初めまして!", 
+INSERT INTO users(username, email, password, profile, photoUrl, createdAt)
+VALUES("Dummy", "dummy@gmail.com","abc", "初めまして!", 
 "https://placehold.jp/150x150.png", "2022-06-09 12:00:00");
 
-# github_usersのテーブル作成
-CREATE TABLE github_users(id int not null auto_increment primary key, userId varchar(32) not null, 
-username varchar(32) not null, photoUrl varchar(255) not null);
-
-# articleのテーブル作成
-CREATE TABLE article(id int not null auto_increment primary key, userId varchar(32) not null,
+# articlesのテーブル作成
+CREATE TABLE articles(id int not null auto_increment primary key, userId int not null,
 title varchar(32) not null, letterBody text not null, photoUrl varchar(255), 
 createdAt datetime not null);
-# articleのデータ挿入
-INSERT INTO article(userId, title, letterBody, photoUrl, createdAt) VALUES("1234", "Hello World!", 
+# articlesのデータ挿入
+INSERT INTO articles(userId, title, letterBody, photoUrl, createdAt) VALUES("1234", "Hello World!", 
 "こんにちは!", "https://placehold.jp/250x250.png", "2022-06-09 12:25:00");
+
+# users_login_historyのテーブル作成
+CREATE TABLE users_login_history(id int not null auto_increment primary key, userId int not null, 
+loginSuccess tinyint not null, loginAt datetime not null);
+# users_login_historyのデータ挿入
+INSERT INTO users_login_history(userId, loginSuccess, loginAt)
+  VALUES
+  (1, 0, "2022-06-01 00:00:00"),
+  (1, 0, "2022-06-02 00:00:00"),
+  (1, 0, "2022-06-03 00:00:00"),
+  (1, 0, "2022-06-04 00:00:00"),
+  (1, 0, "2022-06-05 00:00:00"),
+  (1, 0, "2022-06-06 00:00:00"),
+  (1, 0, "2022-06-07 00:00:00"),
+  (1, 0, "2022-06-08 00:00:00"),
+  (1, 0, "2022-06-09 00:00:00"),
+  (1, 0, "2022-06-10 00:00:00"),
+  (2, 0, "2022-06-01 00:00:00"),
+  (2, 0, "2022-06-02 00:00:00"),
+  (2, 0, "2022-06-03 00:00:00"),
+  (2, 0, "2022-06-04 00:00:00"),
+  (2, 0, "2022-06-05 00:00:00"),
+  (2, 0, "2022-06-06 00:00:00"),
+  (2, 0, "2022-06-07 00:00:00"),
+  (2, 0, "2022-06-08 00:00:00"),
+  (2, 0, "2022-06-09 00:00:00"),
+  (2, 0, "2022-06-10 00:00:00");

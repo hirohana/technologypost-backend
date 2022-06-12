@@ -5,13 +5,13 @@ const { PRIVILEGE } = require("../../lib/security/authPassport.js");
 const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 
-const databaseURL = "./lib/database/sql/article";
+const databaseURL = "./lib/database/sql/articles";
 
 // 記事を全て取得するAPI
 router.get("/", async (req, res, next) => {
   try {
     const queryString = await promisifyReadFile(
-      `${databaseURL}/SELECT_ARTICLE.sql`
+      `${databaseURL}/SELECT_ARTICLES.sql`
     );
     const results = await mysqlAPI.query(queryString);
     res.json(results);
@@ -33,7 +33,7 @@ router.post("/", authorization(PRIVILEGE.NORMAL), async (req, res, next) => {
   try {
     transaction = await mysqlAPI.beginTransaction();
     const queryString = await promisifyReadFile(
-      `${databaseURL}/INSERT_ARTICLE.sql`
+      `${databaseURL}/INSERT_ARTICLES.sql`
     );
     await transaction.query(queryString, [
       data.userId,
