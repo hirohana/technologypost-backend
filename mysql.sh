@@ -1,7 +1,7 @@
 # usersのテーブル作成
 CREATE TABLE users(id int not null auto_increment primary key, 
 username varchar(32) not null, email varchar(64) not null, password varchar(255) not null, 
-profile varchar(255), photoUrl varchar(255) not null, createdAt datetime not null);
+profile varchar(255), photoUrl varchar(255) not null, createdAt datetime not null, lockStatus datetime);
 # usersのデータ挿入
 INSERT INTO users(username, email, password, profile, photoUrl, createdAt)
 VALUES("Dummy", "dummy@gmail.com","abc", "初めまして!", 
