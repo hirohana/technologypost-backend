@@ -1,6 +1,7 @@
 DELETE FROM
   users_login_history
-WHERE id in (
+WHERE 
+  id = (
   SELECT
     id 
   FROM
@@ -10,10 +11,9 @@ WHERE id in (
   FROM
     users_login_history
   WHERE 
-    loginSuccess = 0
-  AND userId = ?
-  ORDER BY loginAt ASC
-  LIMIT 1 OFFSET 0
+    userId = ?
+  ORDER BY login DESC
+  LIMIT 1 OFFSET ?
     ) as alias_users_login_hisotory
 );
 

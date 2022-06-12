@@ -17,9 +17,9 @@ INSERT INTO articles(userId, title, letterBody, photoUrl, createdAt) VALUES("123
 
 # users_login_historyのテーブル作成
 CREATE TABLE users_login_history(id int not null auto_increment primary key, userId int not null, 
-loginSuccess tinyint not null, loginAt datetime not null);
+loginStatus tinyint not null, login datetime not null);
 # users_login_historyのデータ挿入
-INSERT INTO users_login_history(userId, loginSuccess, loginAt)
+INSERT INTO users_login_history(userId, loginStatus, login)
   VALUES
   (1, 0, "2022-06-01 00:00:00"),
   (1, 0, "2022-06-02 00:00:00"),
