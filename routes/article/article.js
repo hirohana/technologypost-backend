@@ -1,16 +1,17 @@
 const router = require("express").Router();
 const mysqlAPI = require("../../lib/database/mysqlAPI");
 
-const { PRIVILEGE } = require("../../lib/security/authPassport.js");
+const { privilege } = require("../../config/application.config.js");
 const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 
-const databaseURL = "./lib/database/sql/article";
+const databaseURL = "./lib/database/sql/articles";
 
+// 記事を全て取得するAPI
 router.get("/", async (req, res, next) => {
   try {
     const queryString = await promisifyReadFile(
-      `${databaseURL}/SELECT_ARTICLE.sql`
+      `${databaseURL}/SELECT_ARTICLES.sql`
     );
     const results = await mysqlAPI.query(queryString);
     res.json(results);
@@ -19,7 +20,8 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", authorization(PRIVILEGE.NORMAL), async (req, res, next) => {
+// 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
+router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
   let transaction;
   const data = {
     userId: req.body.userId,
@@ -31,7 +33,7 @@ router.post("/", authorization(PRIVILEGE.NORMAL), async (req, res, next) => {
   try {
     transaction = await mysqlAPI.beginTransaction();
     const queryString = await promisifyReadFile(
-      `${databaseURL}/INSERT_ARTICLE.sql`
+      `${databaseURL}/INSERT_ARTICLES.sql`
     );
     await transaction.query(queryString, [
       data.userId,

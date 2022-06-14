@@ -6,9 +6,8 @@ const cors = require("cors");
 const gracefulShutdown = require("http-graceful-shutdown");
 
 const accesscontrol = require("./lib/security/authPassport.js");
-
+const { port } = require("./config/application.config.js");
 const app = express();
-const port = process.env.PORT || 5000;
 
 //set middleware
 app.set("view engine", "ejs");

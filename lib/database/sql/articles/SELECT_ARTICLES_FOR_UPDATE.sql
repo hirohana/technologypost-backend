@@ -1,5 +1,5 @@
 SELECT
   *
 FROM
-  article
+  articles
 FOR UPDATE
