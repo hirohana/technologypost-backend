@@ -5,9 +5,37 @@ const { jstNow } = require("../../lib/utils/jstNow.js");
 const { privilege } = require("../../config/application.config.js");
 const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
+const { MAX_ITEMS_PER_PAGE } =
+  require("../../config/application.config.js").search;
 
 const articlesURL = "./lib/database/sql/articles";
 const articles_commentsURL = "./lib/database/sql/articles_comments";
+
+// クエリパラメータに指定された条件に合致した記事を取得するAPI
+// クエリパラメータの値が指定されていなければ最新の記事から取得。
+router.get("/search", async (req, res, next) => {
+  const keyword = req.query.keyword || "";
+  const page = req.query.page || 1;
+  try {
+    if (keyword) {
+      const query = await promisifyReadFile(
+        `${articlesURL}/SELECT_ARTICLES_BY_LIKE_SEARCH.sql`
+      );
+      const data = await mysqlAPI.query(query, [keyword]);
+      res.json(data);
+    } else {
+      const query = await promisifyReadFile(
+        `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
+      );
+      const data = await mysqlAPI.query(query, [
+        page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+      ]);
+      res.json(data);
+    }
+  } catch (err) {
+    next(err);
+  }
+});
 
 // 1.投稿記事のデータベース(articles)から指定されたidの記事の詳細を表示。
 // 2.上記投稿記事のIDをキーとして、article_commentsのデータベースから当該記事のコメントを取得。
@@ -20,20 +48,24 @@ router.get("/:id", async (req, res, next) => {
         `${articles_commentsURL}/SELECT_COMMENTS_BY_ARTICLES_ID.sql`
       ),
     ]);
-    const data = await Promise.all([
+    const result = await Promise.all([
       mysqlAPI.query(queries[0], [id, id]),
       mysqlAPI.query(queries[1], [id]),
     ]);
+    const data = result[0][0];
+    data.comments = result[1] || [];
     res.json(data);
   } catch (err) {
     next(err);
   }
 });
 
-// 投稿記事を全て取得するAPI
+// 投稿記事を日付順で取得するAPI
 router.get("/", async (req, res, next) => {
   try {
-    const query = await promisifyReadFile(`${articlesURL}/SELECT_ARTICLES.sql`);
+    const query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
+    );
     const results = await mysqlAPI.query(query);
     res.json(results);
   } catch (err) {
