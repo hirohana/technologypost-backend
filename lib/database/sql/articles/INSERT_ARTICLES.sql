@@ -1,3 +1,3 @@
 INSERT INTO
-  articles(userId, title, letterBody, createdAt)
+  articles(`user_id`, `title`, `letter_body`, `created_at`)
   VALUES(?, ?, ?, ?)

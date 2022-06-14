@@ -1,7 +1,7 @@
 DELETE FROM
   users_login_history
 WHERE 
-  userId = ?
+  user_id = ?
   AND
   id = (
   SELECT
@@ -13,7 +13,7 @@ WHERE
   FROM
     users_login_history
   WHERE 
-    userId = ?
+    user_id = ?
   ORDER BY login DESC
   LIMIT 1 OFFSET ?
     ) as alias_users_login_hisotory

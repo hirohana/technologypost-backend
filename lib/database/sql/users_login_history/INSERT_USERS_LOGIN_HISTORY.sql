@@ -1,4 +1,4 @@
 INSERT INTO 
-  users_login_history(`userId`, `loginStatus`, `login`)
+  users_login_history(`user_id`, `login_status`, `login`)
 VALUES 
   (?, ?, ?)

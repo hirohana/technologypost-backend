@@ -1,5 +1,5 @@
 UPDATE
   users
 SET
-  lockStatus = ?
+  lock_status = ?
 WHERE id = ?
