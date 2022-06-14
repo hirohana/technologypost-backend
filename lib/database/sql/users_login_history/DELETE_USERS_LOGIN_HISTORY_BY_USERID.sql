@@ -1,6 +1,8 @@
 DELETE FROM
   users_login_history
 WHERE 
+  userId = ?
+  AND
   id = (
   SELECT
     id 

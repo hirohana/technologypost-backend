@@ -5,3 +5,4 @@ FROM
 WHERE 
   userId = ?
   AND login >= ?
+  AND loginStatus = ?
