@@ -13,4 +13,8 @@ module.exports = {
     FAILURE: 0,
     SUCCESS: 1,
   },
+  search: {
+    MAX_ITEMS_PER_PAGE: 6,
+    MAX_ITEMS_WORDS: 5,
+  },
 };

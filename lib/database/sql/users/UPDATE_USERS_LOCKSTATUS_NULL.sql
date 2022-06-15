@@ -1,4 +1,4 @@
 UPDATE
   users
 SET
-  lockStatus = null
+  lock_status = null

@@ -1,6 +1,6 @@
 
 SELECT
-  lockStatus
+  lock_status
 FROM
   users
 WHERE

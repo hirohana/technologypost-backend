@@ -3,6 +3,6 @@ SELECT
 FROM
   users_login_history
 WHERE 
-  userId = ?
+  user_id = ?
   AND login >= ?
-  AND loginStatus = ?
+  AND login_status = ?
