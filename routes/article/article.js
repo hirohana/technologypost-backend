@@ -5,7 +5,7 @@ const { jstNow } = require("../../lib/utils/jstNow.js");
 const { privilege } = require("../../config/application.config.js");
 const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
-const { MAX_ITEMS_PER_PAGE } =
+const { MAX_ITEMS_PER_PAGE, MAX_ITEMS_WORDS } =
   require("../../config/application.config.js").search;
 
 const articlesURL = "./lib/database/sql/articles";
@@ -15,14 +15,24 @@ const articles_commentsURL = "./lib/database/sql/articles_comments";
 // クエリパラメータの値が指定されていなければ最新の記事から取得。
 router.get("/search", async (req, res, next) => {
   const keyword = req.query.keyword || "";
+  const keywordArray = keyword.split(" ");
   const page = req.query.page || 1;
   try {
-    if (keyword) {
+    if (keywordArray.length <= MAX_ITEMS_WORDS) {
       const query = await promisifyReadFile(
         `${articlesURL}/SELECT_ARTICLES_BY_LIKE_SEARCH.sql`
       );
-      const data = await mysqlAPI.query(query, [keyword]);
+      const data = await mysqlAPI.query(query, [
+        keywordArray[0] ? `%${keywordArray[0]}%` : `%%`,
+        keywordArray[1] ? `%${keywordArray[1]}%` : `%%`,
+        keywordArray[2] ? `%${keywordArray[2]}%` : `%%`,
+        keywordArray[3] ? `%${keywordArray[3]}%` : `%%`,
+        keywordArray[4] ? `%${keywordArray[4]}%` : `%%`,
+        page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+      ]);
       res.json(data);
+    } else if (keywordArray.length > MAX_ITEMS_WORDS) {
+      res.status(403).json("検索欄に入力する単語は5個以内でお願いします。");
     } else {
       const query = await promisifyReadFile(
         `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
@@ -62,12 +72,15 @@ router.get("/:id", async (req, res, next) => {
 
 // 投稿記事を日付順で取得するAPI
 router.get("/", async (req, res, next) => {
+  const page = req.query.page || 1;
   try {
     const query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
     );
-    const results = await mysqlAPI.query(query);
-    res.json(results);
+    const data = await mysqlAPI.query(query, [
+      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+    ]);
+    res.json(data);
   } catch (err) {
     next(err);
   }
