@@ -1,8 +1,8 @@
 const express = require("express");
 const cookie = require("cookie-parser");
 const session = require("express-session");
-const flash = require("connect-flash");
 const cors = require("cors");
+const flash = require("connect-flash");
 const gracefulShutdown = require("http-graceful-shutdown");
 
 const accesscontrol = require("./lib/security/authPassport.js");
@@ -13,12 +13,14 @@ const app = express();
 app.set("view engine", "ejs");
 app.disable("x-powered-by");
 // 現在だれでもアクセスできる状態になってるのでデプロイ時には設定変更(引数にオプション)が必要
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(cookie());
 app.use(
   session({
     cookie: {
-      secure: false,
+      httpOnly: true,
+      secure: false, // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
+      maxage: 1000 * 60 * 30,
     },
     secret: "secret",
     resave: false,
