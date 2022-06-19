@@ -5,6 +5,7 @@ const cors = require("cors");
 const flash = require("connect-flash");
 const gracefulShutdown = require("http-graceful-shutdown");
 
+const applicationConfig = require("./config/application.config.js");
 const accesscontrol = require("./lib/security/authPassport.js");
 const { port } = require("./config/application.config.js");
 const app = express();
@@ -13,7 +14,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.disable("x-powered-by");
 // 現在だれでもアクセスできる状態になってるのでデプロイ時には設定変更(引数にオプション)が必要
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: applicationConfig.FRONTEND_URL, credentials: true }));
 app.use(cookie());
 app.use(
   session({
@@ -42,7 +43,7 @@ app.use(
       next();
     });
     router.use("/account", require("./routes/account/account.js"));
-    router.use("/article", require("./routes/article/article.js"));
+    router.use("/articles", require("./routes/articles/articles.js"));
     router.get("/api", (req, res) => {
       res.json({ message: "Hello API!" });
     });

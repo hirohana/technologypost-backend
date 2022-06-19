@@ -17,4 +17,5 @@ module.exports = {
     MAX_ITEMS_PER_PAGE: 6,
     MAX_ITEMS_WORDS: 5,
   },
+  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
 };

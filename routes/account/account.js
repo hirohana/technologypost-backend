@@ -3,18 +3,26 @@ const { authentication } = require("../../lib/security/authPassport");
 
 // ログイン認証が成功した際のリダイレクト先
 router.get("/login/success", (req, res, next) => {
-  res.status(200).json(req.user);
+  res
+    .status(200)
+    .json({ user: req.user, message: "ログイン処理に成功しました。" });
 });
 
 // ログイン認証が失敗した際のリダイレクト先
 router.get("/login/failure", (req, res, next) => {
   switch (req.flash("message")[0]) {
     case "Emailまたはパスワードが間違っています。":
-      return res.status(401).json("Emailまたはパスワードが間違っています。");
+      return res
+        .status(401)
+        .json({ message: "Emailまたはパスワードが間違っています。" });
     case "アカウントがロックされています。":
-      return res.status(403).json("アカウントがロックされています。");
+      return res.status(403).json({
+        message: `現在アカウントがロックされています。\n 10分程経過した後に、ログイン認証をお試しください。`,
+      });
     default:
-      return res.status(500).json("サーバ側にエラーが発生しています。");
+      return res
+        .status(500)
+        .json({ message: "サーバ側にエラーが発生しています。" });
   }
 });
 

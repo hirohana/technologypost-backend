@@ -13,6 +13,7 @@ const articles_commentsURL = "./lib/database/sql/articles_comments";
 
 // クエリパラメータに指定された条件に合致した記事を取得するAPI
 // クエリパラメータの値が指定されていなければ最新の記事から取得。
+// ※req.query.keywordもクライアント側に渡して検索キーワードに入れる。リロードするわけではないので渡す必要はない？
 router.get("/search", async (req, res, next) => {
   const keyword = req.query.keyword || "";
   const keywordArray = keyword.split(" ");
@@ -70,22 +71,6 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// 投稿記事を日付順で取得するAPI
-router.get("/", async (req, res, next) => {
-  const page = req.query.page || 1;
-  try {
-    const query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
-    );
-    const data = await mysqlAPI.query(query, [
-      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-    ]);
-    res.json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
 // 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
 router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
   let transaction;
@@ -110,6 +95,33 @@ router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
     res.status(200).json(data);
   } catch (err) {
     await transaction.rollback();
+    next(err);
+  }
+});
+
+// 1.投稿記事のデータベース(articles)から記事を作成日付順で取得。
+// 2.投稿記事の総数を取得。
+router.get("/", async (req, res, next) => {
+  const page = req.query.page || 1;
+  try {
+    let query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
+    );
+    const data = await mysqlAPI.query(query, [
+      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+    ]);
+    query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES.sql`
+    );
+    const count = await mysqlAPI.query(query);
+    const paginationMaxCount = Math.ceil(
+      count[0].totalPages / MAX_ITEMS_PER_PAGE
+    );
+    res.json({
+      data,
+      pagination: { totalPages: count[0].totalPages, paginationMaxCount },
+    });
+  } catch (err) {
     next(err);
   }
 });
