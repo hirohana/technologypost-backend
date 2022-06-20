@@ -18,9 +18,10 @@ router.get("/search", async (req, res, next) => {
   const keyword = req.query.keyword || "";
   const keywordArray = keyword.split(" ");
   const page = req.query.page || 1;
+  let query;
   try {
     if (keywordArray.length <= MAX_ITEMS_WORDS) {
-      const query = await promisifyReadFile(
+      query = await promisifyReadFile(
         `${articlesURL}/SELECT_ARTICLES_BY_LIKE_SEARCH.sql`
       );
       const data = await mysqlAPI.query(query, [
@@ -31,7 +32,26 @@ router.get("/search", async (req, res, next) => {
         keywordArray[4] ? `%${keywordArray[4]}%` : `%%`,
         page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
       ]);
-      res.json(data);
+
+      query = await promisifyReadFile(
+        `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES_BY_LIKE_SEARCH.sql`
+      );
+      const count = await mysqlAPI.query(query, [
+        keywordArray[0] ? `%${keywordArray[0]}%` : `%%`,
+        keywordArray[1] ? `%${keywordArray[1]}%` : `%%`,
+        keywordArray[2] ? `%${keywordArray[2]}%` : `%%`,
+        keywordArray[3] ? `%${keywordArray[3]}%` : `%%`,
+        keywordArray[4] ? `%${keywordArray[4]}%` : `%%`,
+      ]);
+      const paginationMaxCount = Math.ceil(
+        count[0].totalPages / MAX_ITEMS_PER_PAGE
+      )
+        ? Math.ceil(count[0].totalPages / MAX_ITEMS_PER_PAGE)
+        : 1;
+      res.json({
+        data,
+        pagination: { totalPages: count[0].totalPages, paginationMaxCount },
+      });
     } else if (keywordArray.length > MAX_ITEMS_WORDS) {
       res.status(403).json("検索欄に入力する単語は5個以内でお願いします。");
     } else {
@@ -103,8 +123,9 @@ router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
 // 2.投稿記事の総数を取得。
 router.get("/", async (req, res, next) => {
   const page = req.query.page || 1;
+  let query;
   try {
-    let query = await promisifyReadFile(
+    query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
     );
     const data = await mysqlAPI.query(query, [
