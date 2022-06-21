@@ -17,7 +17,7 @@ router.use("/search", require("./search.js"));
 
 // 1.投稿記事のデータベース(articles)から指定されたidの記事の詳細を表示。
 // 2.上記投稿記事のIDをキーとして、article_commentsのデータベースから当該記事のコメントを取得。
-router.get("/:id", async (req, res, next) => {
+router.get("/article/:id", async (req, res, next) => {
   const id = Number(req.params.id);
   try {
     const queries = await Promise.all([
@@ -32,7 +32,7 @@ router.get("/:id", async (req, res, next) => {
     ]);
     const data = result[0][0];
     data.comments = result[1] || [];
-    res.json(data);
+    res.json({ data });
   } catch (err) {
     next(err);
   }
