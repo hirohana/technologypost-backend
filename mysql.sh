@@ -104,16 +104,9 @@ INSERT INTO articles_comments(articles_id, user_id, comment, created_at)
   (1, 1, "2回目コメントありがとう!", "2022-06-14 22:00:00");
 
 # draftArticlesのテーブル作成
-CREATE TABLE draftArticles(id int not null auto_increment primary key, user_id int not null,
+CREATE TABLE draft_articles(id int not null auto_increment primary key, user_id int not null,
 title varchar(32) not null, letter_body text, photo_url varchar(255), 
 created_at datetime not null);
 # draftArticlesのデータ挿入
-INSERT INTO articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "下書きです!", 
+INSERT INTO draft_articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "下書きです!", 
 "下書きです!。こんにちは!", "https://placehold.jp/250x250.png", "2022-06-23 00:00:00");
-
-# # github_usersのテーブル作成
-# CREATE TABLE github_users(id int not null auto_increment primary key, username varchar(32) not null, 
-# photo_url varchar(255) not null);
-# # github_usersのデータ挿入
-# INSERT INTO github_users(id, username, photo_url) VALUES(64699590, "hirohana", 
-# 'https://avatars.githubusercontent.com/u/64699590?v=4');
