@@ -18,7 +18,7 @@ SELECT
   aco.comment,
   aco.created_at AS comment_created_at
 FROM
-  (SELECT * FROM articles ORDER BY created_at DESC) AS a
+  (SELECT * FROM articles WHERE public = 1 ORDER BY created_at DESC) AS a
   LEFT OUTER JOIN
     articles_category AS ac
   ON  a.id = ac.articles_id
@@ -57,6 +57,7 @@ FROM
           LEFT OUTER JOIN
             users AS u
             ON a.user_id = u.id
+    WHERE a.public = 1
     GROUP BY a.id
 `;
 

@@ -10,10 +10,13 @@ VALUES("Dummy", "dummy@gmail.com","$2b$10$Etc2SKDOWqaGiT61eB6f7OWzqN1ll3iLKzerfo
 # articlesのテーブル作成
 CREATE TABLE articles(id int not null auto_increment primary key, user_id int not null,
 title varchar(32) not null, letter_body text not null, photo_url varchar(255), 
-created_at datetime not null);
+created_at datetime not null, public tinyint not null);
 # articlesのデータ挿入
-INSERT INTO articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "Hello World!", 
-"こんにちは!", "https://placehold.jp/250x250.png", "2022-06-09 12:25:00");
+INSERT INTO articles(user_id, title, letter_body, photo_url, created_at, public) 
+  VALUES
+  ("1", "Hello World!", "こんにちは!", "https://placehold.jp/250x250.png", "2022-06-22 12:27:00", 1),
+  ("1", "下書きHello World!", "下書きこんにちは!", "https://placehold.jp/250x250.png", "2022-06-22 13:25:00", 0),
+  ("1", "下書きHello World!2", "下書きこんにちは!2", "https://placehold.jp/250x250.png", "2022-06-22 14:25:00", 0);
 
 # users_login_historyのテーブル作成
 CREATE TABLE users_login_history(id int not null auto_increment primary key, user_id int not null, 
@@ -103,10 +106,10 @@ INSERT INTO articles_comments(articles_id, user_id, comment, created_at)
   (1, 1, "コメントありがとう!", "2022-06-14 21:00:00"),
   (1, 1, "2回目コメントありがとう!", "2022-06-14 22:00:00");
 
-# draftArticlesのテーブル作成
-CREATE TABLE draft_articles(id int not null auto_increment primary key, user_id int not null,
-title varchar(32) not null, letter_body text, photo_url varchar(255), 
-created_at datetime not null);
-# draftArticlesのデータ挿入
-INSERT INTO draft_articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "下書きです!", 
-"下書きです!。こんにちは!", "https://placehold.jp/250x250.png", "2022-06-23 00:00:00");
+# # draftArticlesのテーブル作成
+# CREATE TABLE draft_articles(id int not null auto_increment primary key, user_id int not null,
+# title varchar(32) not null, letter_body text, photo_url varchar(255), 
+# created_at datetime not null);
+# # draftArticlesのデータ挿入
+# INSERT INTO draft_articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "下書きです!", 
+# "下書きです!。こんにちは!", "https://placehold.jp/250x250.png", "2022-06-23 00:00:00");

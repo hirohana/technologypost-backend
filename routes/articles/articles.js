@@ -9,7 +9,6 @@ const { MAX_ITEMS_PER_PAGE } =
   require("../../config/application.config.js").search;
 
 const articlesURL = "./lib/database/sql/articles";
-const draft_articlesURL = "./lib/database/sql/draftArticles";
 const articles_commentsURL = "./lib/database/sql/articles_comments";
 
 // クエリパラメータに指定された条件に合致した記事を取得するAPI
@@ -34,9 +33,9 @@ router.get("/article/:id", async (req, res, next) => {
   }
 });
 
-// IDに一致した公開記事をデータベース(articles)から削除するAPI
+// 記事IDに一致した公開記事をデータベース(articles)から削除するAPI
 router.delete(
-  "/user/public_articles/delete",
+  "/user/article_list/delete",
   // authorization(privilege.NORMAL),
   async (req, res, next) => {
     const id = Number(req.query.id);
@@ -54,10 +53,11 @@ router.delete(
 );
 
 // 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
-router.get("/user/public_articles", async (req, res, next) => {
+router.get("/user/article_list", async (req, res, next) => {
   const userId = Number(req.query.userId);
   const page = Number(req.query.page) || 1;
   let query;
+
   try {
     query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_BY_USER_ID.sql`
@@ -69,36 +69,6 @@ router.get("/user/public_articles", async (req, res, next) => {
     ]);
     query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES_BY_USER_ID.sql`
-    );
-    const count = await mysqlAPI.query(query, [userId]);
-    const paginationMaxCount = Math.ceil(
-      count[0].totalPages / MAX_ITEMS_PER_PAGE
-    );
-    res.json({
-      data,
-      pagination: { totalPages: count[0].totalPages, paginationMaxCount },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// 該当ユーザーの下書き記事をデータベース(draft_articles)から作成日付順に取得するAPI
-router.get("/user/draft_articles", async (req, res, next) => {
-  const userId = Number(req.query.userId);
-  const page = Number(req.query.page) || 1;
-  let query;
-  try {
-    query = await promisifyReadFile(
-      `${draft_articlesURL}/SELECT_DRAFT_ARTICLES_BY_USER_ID.sql`
-    );
-    const data = await mysqlAPI.query(query, [
-      userId,
-      MAX_ITEMS_PER_PAGE,
-      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-    ]);
-    query = await promisifyReadFile(
-      `${draft_articlesURL}/SELECT_DRAFT_ARTICLES_TOTAL_NUMBER_OF_PAGES_BY_USER_ID.sql`
     );
     const count = await mysqlAPI.query(query, [userId]);
     const paginationMaxCount = Math.ceil(
@@ -126,7 +96,9 @@ router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
 
   try {
     transaction = await mysqlAPI.beginTransaction();
-    const query = await promisifyReadFile(`${articlesURL}/INSERT_ARTICLES.sql`);
+    const query = await promisifyReadFile(
+      `${articlesURL}/INSERT_ARTICLES_PUBLIC.sql`
+    );
     await transaction.query(query, [
       data.userId,
       data.title,
