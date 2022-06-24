@@ -102,3 +102,11 @@ INSERT INTO articles_comments(articles_id, user_id, comment, created_at)
   VALUES
   (1, 1, "コメントありがとう!", "2022-06-14 21:00:00"),
   (1, 1, "2回目コメントありがとう!", "2022-06-14 22:00:00");
+
+# draftArticlesのテーブル作成
+CREATE TABLE draft_articles(id int not null auto_increment primary key, user_id int not null,
+title varchar(32) not null, letter_body text, photo_url varchar(255), 
+created_at datetime not null);
+# draftArticlesのデータ挿入
+INSERT INTO draft_articles(user_id, title, letter_body, photo_url, created_at) VALUES("1", "下書きです!", 
+"下書きです!。こんにちは!", "https://placehold.jp/250x250.png", "2022-06-23 00:00:00");

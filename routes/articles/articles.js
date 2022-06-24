@@ -17,25 +17,50 @@ router.use("/search", require("./search.js"));
 
 // 1.投稿記事のデータベース(articles)から指定されたidの記事の詳細を表示。
 // 2.上記投稿記事のIDをキーとして、article_commentsのデータベースから当該記事のコメントを取得。
-router.get("/:id", async (req, res, next) => {
+router.get("/article/:id", async (req, res, next) => {
   const id = Number(req.params.id);
+  let query;
   try {
-    const queries = await Promise.all([
-      promisifyReadFile(`${articlesURL}/SELECT_ARTICLES_BY_ID.sql`),
-      promisifyReadFile(
-        `${articles_commentsURL}/SELECT_COMMENTS_BY_ARTICLES_ID.sql`
-      ),
-    ]);
-    const result = await Promise.all([
-      mysqlAPI.query(queries[0], [id, id]),
-      mysqlAPI.query(queries[1], [id]),
-    ]);
-    const data = result[0][0];
-    data.comments = result[1] || [];
-    res.json(data);
+    query = await promisifyReadFile(`${articlesURL}/SELECT_ARTICLES_BY_ID.sql`);
+    const data = await mysqlAPI.query(query, [id, id]);
+    query = await promisifyReadFile(
+      `${articles_commentsURL}/SELECT_COMMENTS_BY_ARTICLES_ID.sql`
+    );
+    const comments = await mysqlAPI.query(query, [id]);
+    res.json({ data, comments });
   } catch (err) {
     next(err);
   }
+});
+
+// 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
+router.get("/user/public_articles", async (req, res, next) => {
+  const userId = Number(req.query.userId);
+  const page = Number(req.query.page) || 1;
+  const query = await promisifyReadFile(
+    `${articlesURL}/SELECT_ARTICLES_BY_USER_ID.sql`
+  );
+  const data = await mysqlAPI.query(query, [
+    userId,
+    MAX_ITEMS_PER_PAGE,
+    page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+  ]);
+  res.json(data);
+});
+
+// 該当ユーザーの下書き記事をデータベース(draft_articles)から作成日付順に取得するAPI
+router.get("/user/draft_articles", async (req, res, next) => {
+  const userId = Number(req.query.userId);
+  const page = Number(req.query.page) || 1;
+  const query = await promisifyReadFile(
+    `${articlesURL}/SELECT_DRAFT_ARTICLES_BY_USER_ID.sql`
+  );
+  const data = await mysqlAPI.query(query, [
+    userId,
+    MAX_ITEMS_PER_PAGE,
+    page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+  ]);
+  res.json(data);
 });
 
 // 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
@@ -69,7 +94,7 @@ router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
 // 1.投稿記事のデータベース(articles)から記事を作成日付順で取得。
 // 2.投稿記事の総数を取得。
 router.get("/", async (req, res, next) => {
-  const page = req.query.page || 1;
+  const page = Number(req.query.page) || 1;
   let query;
   try {
     query = await promisifyReadFile(
