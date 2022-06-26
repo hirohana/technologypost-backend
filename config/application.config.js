@@ -18,4 +18,8 @@ module.exports = {
     MAX_ITEMS_WORDS: 5,
   },
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
+  public_state: {
+    true: 1,
+    false: 0,
+  },
 };

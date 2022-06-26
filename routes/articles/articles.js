@@ -7,6 +7,7 @@ const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 const { MAX_ITEMS_PER_PAGE } =
   require("../../config/application.config.js").search;
+const { public_state } = require("../../config/application.config.js");
 
 const articlesURL = "./lib/database/sql/articles";
 const articles_commentsURL = "./lib/database/sql/articles_comments";
@@ -33,24 +34,47 @@ router.get("/article/:id", async (req, res, next) => {
   }
 });
 
-// 記事IDに一致した公開記事をデータベース(articles)から削除するAPI
-router.delete(
-  "/user/article_list/delete",
-  // authorization(privilege.NORMAL),
-  async (req, res, next) => {
-    const id = Number(req.query.id);
-    let query;
-    try {
-      query = await promisifyReadFile(
-        `${articlesURL}/DELETE_ARTICLES_BY_ID.sql`
-      );
-      await mysqlAPI.query(query, [id]);
-      res.json({ message: "記事が削除されました。" });
-    } catch (err) {
-      next(err);
+// 記事の状態(public)を公開(tinyintが1)、非公開(tinyintが0)に変更するAPI
+router.put("/user/article_list/update/public", async (req, res, next) => {
+  const id = Number(req.query.id);
+  const publicState =
+    req.query.public === "true" ? public_state.true : public_state.false;
+  let transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    const query = await promisifyReadFile(
+      `${articlesURL}/UPDATE_ARTICLES_COLUMN_OF_PUBLIC_BY_ID.sql`
+    );
+    await transaction.query(query, [publicState, id]);
+    await transaction.commit();
+    if (publicState === public_state.true) {
+      res.json({ message: "日記が公開されました。" });
+    } else {
+      res.json({ message: "日記が非公開になりました。" });
     }
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
   }
-);
+});
+
+// 記事IDに一致した公開記事をデータベース(articles)から削除するAPI
+router.delete("/user/article_list/delete", async (req, res, next) => {
+  const id = Number(req.query.id);
+  let query, transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    query = await promisifyReadFile(`${articlesURL}/DELETE_ARTICLES_BY_ID.sql`);
+    await transaction.query(query, [id]);
+    await transaction.commit();
+    res.json({ message: "記事が削除されました。" });
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
+  }
+});
 
 // 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
 router.get("/user/article_list", async (req, res, next) => {
