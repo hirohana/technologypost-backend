@@ -20,4 +20,5 @@ FROM
         users AS u
       ON a.user_id = u.id
 WHERE a.id = ?
+  AND a.public = 1
 GROUP BY a.id = ?

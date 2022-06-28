@@ -7,6 +7,7 @@ const { authorization } = require("../../lib/utils/authorization.js");
 const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 const { MAX_ITEMS_PER_PAGE } =
   require("../../config/application.config.js").search;
+const { public_state } = require("../../config/application.config.js");
 
 const articlesURL = "./lib/database/sql/articles";
 const articles_commentsURL = "./lib/database/sql/articles_comments";
@@ -33,34 +34,82 @@ router.get("/article/:id", async (req, res, next) => {
   }
 });
 
-// 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
-router.get("/user/public_articles", async (req, res, next) => {
-  const userId = Number(req.query.userId);
-  const page = Number(req.query.page) || 1;
-  const query = await promisifyReadFile(
-    `${articlesURL}/SELECT_ARTICLES_BY_USER_ID.sql`
-  );
-  const data = await mysqlAPI.query(query, [
-    userId,
-    MAX_ITEMS_PER_PAGE,
-    page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-  ]);
-  res.json(data);
+// 記事の状態(public)を公開(tinyintが1)、非公開(tinyintが0)に変更するAPI
+router.put("/user/article_list/update/public", async (req, res, next) => {
+  const id = Number(req.query.id);
+  const publicState =
+    req.query.public === "true" ? public_state.true : public_state.false;
+  let transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    const query = await promisifyReadFile(
+      `${articlesURL}/UPDATE_ARTICLES_COLUMN_OF_PUBLIC_BY_ID.sql`
+    );
+    await transaction.query(query, [publicState, id]);
+    await transaction.commit();
+    if (publicState === public_state.true) {
+      res.json({ message: "日記が公開されました。" });
+    } else {
+      res.json({ message: "日記が非公開になりました。" });
+    }
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
+  }
 });
 
-// 該当ユーザーの下書き記事をデータベース(draft_articles)から作成日付順に取得するAPI
-router.get("/user/draft_articles", async (req, res, next) => {
+// 記事IDに一致した公開記事をデータベース(articles)から削除するAPI
+router.delete("/user/article_list/delete", async (req, res, next) => {
+  const id = Number(req.query.id);
+  let query, transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    query = await promisifyReadFile(`${articlesURL}/DELETE_ARTICLES_BY_ID.sql`);
+    await transaction.query(query, [id]);
+    await transaction.commit();
+    res.json({ message: "記事が削除されました。" });
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
+  }
+});
+
+// 該当ユーザーの公開記事の最新記事IDを取得するAPI
+router.get("/user/article_list/:user_id", (req, res, next) => {
+  const 
+})
+
+// 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
+router.get("/user/article_list", async (req, res, next) => {
   const userId = Number(req.query.userId);
   const page = Number(req.query.page) || 1;
-  const query = await promisifyReadFile(
-    `${articlesURL}/SELECT_DRAFT_ARTICLES_BY_USER_ID.sql`
-  );
-  const data = await mysqlAPI.query(query, [
-    userId,
-    MAX_ITEMS_PER_PAGE,
-    page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-  ]);
-  res.json(data);
+  let query;
+
+  try {
+    query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_BY_USER_ID.sql`
+    );
+    const data = await mysqlAPI.query(query, [
+      userId,
+      MAX_ITEMS_PER_PAGE,
+      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
+    ]);
+    query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES_BY_USER_ID.sql`
+    );
+    const count = await mysqlAPI.query(query, [userId]);
+    const paginationMaxCount = Math.ceil(
+      count[0].totalPages / MAX_ITEMS_PER_PAGE
+    );
+    res.json({
+      data,
+      pagination: { totalPages: count[0].totalPages, paginationMaxCount },
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
@@ -76,7 +125,9 @@ router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
 
   try {
     transaction = await mysqlAPI.beginTransaction();
-    const query = await promisifyReadFile(`${articlesURL}/INSERT_ARTICLES.sql`);
+    const query = await promisifyReadFile(
+      `${articlesURL}/INSERT_ARTICLES_PUBLIC.sql`
+    );
     await transaction.query(query, [
       data.userId,
       data.title,

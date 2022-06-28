@@ -1,5 +1,5 @@
 SELECT 
   count(*) AS totalPages
 FROM
-  articles
-WHERE public = 1
+  articles AS a
+WHERE a.user_id = ?

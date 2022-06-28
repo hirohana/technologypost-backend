@@ -11,7 +11,7 @@ SELECT
   aco.comment,
   aco.created_at AS comment_created_at
 FROM
-  (SELECT * FROM articles ORDER BY created_at DESC LIMIT 6 OFFSET ?) AS a
+  (SELECT * FROM articles WHERE public = 1 ORDER BY created_at DESC LIMIT 6 OFFSET ?) AS a
   LEFT OUTER JOIN
     articles_category AS ac
   ON  a.id = ac.articles_id
