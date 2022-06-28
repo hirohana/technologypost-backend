@@ -76,6 +76,11 @@ router.delete("/user/article_list/delete", async (req, res, next) => {
   }
 });
 
+// 該当ユーザーの公開記事の最新記事IDを取得するAPI
+router.get("/user/article_list/:user_id", (req, res, next) => {
+  const 
+})
+
 // 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
 router.get("/user/article_list", async (req, res, next) => {
   const userId = Number(req.query.userId);
