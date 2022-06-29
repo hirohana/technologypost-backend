@@ -1,7 +1,7 @@
 const router = require("express").Router();
-const mysqlAPI = require("../../lib/database/mysqlAPI");
+const mysqlAPI = require("../../../lib/database/mysqlAPI");
 const { MAX_ITEMS_PER_PAGE } =
-  require("../../config/application.config.js").search;
+  require("../../../config/application.config.js").search;
 
 // 検索keywordの個数に応じて動的にクエリを作成するため、バードコーディングで下記2つのSQLを記述。
 const articlesByLikeSearchSQL = `

@@ -42,12 +42,9 @@ app.use(
       res.setHeader("X-Frame-Options", "SAMEORIGIN");
       next();
     });
-    router.use("/account", require("./routes/account/account.js"));
-    router.use("/articles", require("./routes/articles/articles.js"));
-    router.get("/api", (req, res) => {
-      res.json({ message: "Hello API!" });
-    });
-    router.get("/", (req, res) => {
+    router.use("/api/v1/account", require("./routes/account/account.js"));
+    router.use("/api/v1/articles", require("./routes/articles/articles.js"));
+    router.get("/api/v1", (req, res) => {
       res.json("Hello Express!");
     });
     return router;

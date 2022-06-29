@@ -15,9 +15,9 @@ router.get("/login/failure", (req, res, next) => {
       return res
         .status(401)
         .json({ message: "Emailまたはパスワードが間違っています。" });
-    case "アカウントがロックされています。":
+    case `現在アカウントがロックされています。しばらくしたら再度ログイン認証をお試しください。`:
       return res.status(403).json({
-        message: `現在アカウントがロックされています。\n 10分程経過した後に、ログイン認証をお試しください。`,
+        message: `現在アカウントがロックされています。しばらくしたら再度ログイン認証をお試しください。`,
       });
     default:
       return res
