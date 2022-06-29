@@ -143,7 +143,7 @@ router.delete("/:id", async (req, res, next) => {
 // 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
 router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
   let transaction;
-  const now = jstNow();
+  const { now } = jstNow();
   const data = {
     userId: req.body.user_id,
     title: req.body.title,
