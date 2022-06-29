@@ -71,6 +71,20 @@ router.get("/page/:page", async (req, res, next) => {
   }
 });
 
+// ユーザーの最新の記事IDを取得し、インクリメントを行いそれを返すAPI
+router.get("/users/:id", async (req, res, next) => {
+  const userId = req.params.id;
+  try {
+    const query = await promisifyReadFile(
+      `${articlesURL}/SELECT_ARTICLES_LATEST_ID_BY_USER_ID.sql`
+    );
+    const data = await mysqlAPI.query(query, [userId]);
+    res.json({ id: ++data[0].id });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // 記事の状態(public)を公開(tinyintが1)、非公開(tinyintが0)に変更するAPI
 router.put("/:id/:public", async (req, res, next) => {
   const id = Number(req.params.id);
@@ -118,7 +132,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// 記事IDに一致した公開記事をデータベース(articles)から削除するAPI
+// 記事データベース(articles)から該当記事を削除するAPI
 router.delete("/:id", async (req, res, next) => {
   const id = Number(req.params.id);
   let query, transaction;
@@ -134,11 +148,6 @@ router.delete("/:id", async (req, res, next) => {
     next(err);
   }
 });
-
-// 該当ユーザー公開記事の最新記事IDを取得するAPI
-// router.get("/user/article_list/:user_id", (req, res, next) => {
-//   const
-// })
 
 // 認可処理が挟まれた(authorization(PRIVILEGE.NORMAL))、記事投稿API
 router.post("/", authorization(privilege.NORMAL), async (req, res, next) => {
