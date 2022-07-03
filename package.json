@@ -9,7 +9,7 @@
     "heroku-postbuild": "yarn install"
   },
   "keywords": [],
-  "author": "",
+  "author": "hirohana <hirohanahaba@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@types/jest": "^28.1.1",
@@ -36,5 +36,6 @@
     "passport-github2": "0.1.9",
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.5.0"
-  }
+  },
+  "repository": "git@github.com:hirohana/Node-Express--MySQL-Heroku.git"
 }
