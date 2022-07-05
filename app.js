@@ -1,18 +1,18 @@
-const express = require("express");
-const cookie = require("cookie-parser");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
-const gracefulShutdown = require("http-graceful-shutdown");
+const express = require('express');
+const cookie = require('cookie-parser');
+const session = require('express-session');
+const cors = require('cors');
+const flash = require('connect-flash');
+const gracefulShutdown = require('http-graceful-shutdown');
 
-const applicationConfig = require("./config/application.config.js");
-const accesscontrol = require("./lib/security/authPassport.js");
-const { port } = require("./config/application.config.js");
+const applicationConfig = require('./config/application.config.js');
+const accesscontrol = require('./lib/security/authPassport.js');
+const { port } = require('./config/application.config.js');
 const app = express();
 
 //set middleware
-app.set("view engine", "ejs");
-app.disable("x-powered-by");
+app.set('view engine', 'ejs');
+app.disable('x-powered-by');
 // 現在だれでもアクセスできる状態になってるのでデプロイ時には設定変更(引数にオプション)が必要
 app.use(cors({ origin: applicationConfig.FRONTEND_URL, credentials: true }));
 app.use(cookie());
@@ -23,7 +23,7 @@ app.use(
       secure: false, // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
       maxage: 1000 * 60 * 30,
     },
-    secret: "secret",
+    secret: 'secret',
     resave: false,
     saveUninitialized: false,
   })
@@ -35,18 +35,15 @@ app.use(...accesscontrol.initialize());
 
 // dynamic resource rooting
 app.use(
-  "/",
+  '/',
   (() => {
     const router = express.Router();
     router.use((req, res, next) => {
-      res.setHeader("X-Frame-Options", "SAMEORIGIN");
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
       next();
     });
-    router.use("/api/v1/account", require("./routes/account/account.js"));
-    router.use("/api/v1/articles", require("./routes/articles/articles.js"));
-    router.get("/api/v1", (req, res) => {
-      res.json("Hello Express!");
-    });
+    router.use('/api/v1/account', require('./routes/account/account.js'));
+    router.use('/api/v1/articles', require('./routes/articles/articles.js'));
     return router;
   })()
 );
@@ -63,11 +60,11 @@ const server = app.listen(port, () => {
 
 // graceful shutdown
 gracefulShutdown(server, {
-  signals: "SIGINT SIGTERM",
+  signals: 'SIGINT SIGTERM',
   timeout: 10000,
   onShutdown: () => {
     return new Promise((resolve, reject) => {
-      const { pool } = require("./lib/database/pool");
+      const { pool } = require('./lib/database/pool');
       pool.end((err) => {
         if (err) {
           return reject(err);
@@ -77,6 +74,6 @@ gracefulShutdown(server, {
     });
   },
   finally: () => {
-    console.info("application finished");
+    console.info('application finished');
   },
 });

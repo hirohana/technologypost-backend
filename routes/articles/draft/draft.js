@@ -25,7 +25,7 @@ router.post('/', async (req, res, next) => {
   try {
     transaction = await mysqlAPI.beginTransaction();
     query = await promisifyReadFile(
-      `${articlesURL}/INSERT_ARTICLES_DRAFT_DATA_FOR_UPDATE.sql`
+      `${articlesURL}/INSERT_ARTICLES_DRAFT_DATA.sql`
     );
     await transaction.query(query, [
       data.userId,
@@ -52,14 +52,13 @@ router.post('/', async (req, res, next) => {
         parametaArticlesCategory.push(Number(categories[i].id));
       }
     }
-    console.log(queryInsertArticlesCategory);
-    console.log(parametaArticlesCategory);
+
     await transaction.query(
       queryInsertArticlesCategory,
       parametaArticlesCategory
     );
     await transaction.commit();
-    res.status(200).json({ message: '下書きデータが保存されました。' });
+    res.status(200).end();
   } catch (err) {
     await transaction.rollback();
     next(err);

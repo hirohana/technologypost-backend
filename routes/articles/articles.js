@@ -1,87 +1,50 @@
 const router = require('express').Router();
 const mysqlAPI = require('../../lib/database/mysqlAPI');
 const { promisifyReadFile } = require('../../lib/utils/promisifyReadFile.js');
-const { MAX_ITEMS_PER_PAGE } =
-  require('../../config/application.config.js').search;
 const { public_state } = require('../../config/application.config.js');
 
 const articlesURL = './lib/database/sql/articles';
 const articles_commentsURL = './lib/database/sql/articles_comments';
-const categoryURL = './lib/database/sql/category';
+const articles_categoryURL = './lib/database/sql/articles_category';
 
-// 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
-router.get('/page/:page/users/:id', async (req, res, next) => {
-  const page = Number(req.params.page) || 1;
-  const userId = Number(req.params.id);
-  let query;
+// 1. 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
+// 2. 投稿記事のデータベース(articles)から記事を作成日付順で取得するAPIを記述。
+router.use('/page', require('./page/page.js'));
 
-  try {
-    query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_BY_USER_ID.sql`
-    );
-    const data = await mysqlAPI.query(query, [
-      userId,
-      MAX_ITEMS_PER_PAGE,
-      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-    ]);
-    query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES_BY_USER_ID.sql`
-    );
-    const count = await mysqlAPI.query(query, [userId]);
-    const paginationMaxCount = Math.ceil(
-      count[0].totalPages / MAX_ITEMS_PER_PAGE
-    );
-    res.json({
-      data,
-      pagination: { totalPages: count[0].totalPages, paginationMaxCount },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+// クエリパラメータに指定された条件に合致した記事を取得するAPI
+// クエリパラメータの値が指定されていなければ最新の記事から取得。
+router.use('/search', require('./search/search.js'));
 
-// 記事データベース(articles)からユーザーの下書き記事データを取得するAPI
+// 1.記事データベース(articles)に下書き記事を投稿。
+// 2.記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
+// 記事IDとカテゴリーIDを投稿するAPI
+router.use('/draft', require('./draft/draft.js'));
+
+// カテゴリーデータベース(category)からカテゴリー一覧全て取得するAPI
+router.use('/category', require('./category/category.js'));
+
+// 1. 記事データベース(articles)から、URLパラメータから取得した記事IDを元に
+//    ユーザーの下書き記事データを取得する
+// 2. 記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
+//    URLパラメータから取得した記事IDを元に、登録されているカテゴリーIDを取得するAPI
 router.get('/:id/draft', async (req, res, next) => {
   if (req.params.id === 'undefined') {
     res.json({ message: '下書きデータが存在しません。' });
     return;
   }
   const articleId = Number(req.params.id);
+  let query;
 
   try {
-    const query = await promisifyReadFile(
+    query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_DRAFT_DATA_BY_ARTICLE_ID.sql`
     );
     const data = await mysqlAPI.query(query, [articleId]);
-    res.json({ data });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// 1.投稿記事のデータベース(articles)から記事を作成日付順で取得。
-// 2.投稿記事の総数を取得。
-router.get('/page/:page', async (req, res, next) => {
-  const page = Number(req.params.page) || 1;
-  let query;
-  try {
     query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_CREATE_DESC.sql`
+      `${articles_categoryURL}/SELECT_ARTICLES_CATEGORY_BY_ARTICLE_ID.sql`
     );
-    const data = await mysqlAPI.query(query, [
-      page * MAX_ITEMS_PER_PAGE - MAX_ITEMS_PER_PAGE,
-    ]);
-    query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_TOTAL_NUMBER_OF_PAGES.sql`
-    );
-    const count = await mysqlAPI.query(query);
-    const paginationMaxCount = Math.ceil(
-      count[0].totalPages / MAX_ITEMS_PER_PAGE
-    );
-    res.json({
-      data,
-      pagination: { totalPages: count[0].totalPages, paginationMaxCount },
-    });
+    const categories = await mysqlAPI.query(query, [articleId]);
+    res.json({ data, categories });
   } catch (err) {
     next(err);
   }
@@ -108,25 +71,6 @@ router.put('/:id/:public', async (req, res, next) => {
     }
   } catch (err) {
     await transaction.rollback();
-    next(err);
-  }
-});
-
-// クエリパラメータに指定された条件に合致した記事を取得するAPI
-// クエリパラメータの値が指定されていなければ最新の記事から取得。
-router.use('/search', require('./search/search.js'));
-
-// 1.記事データベース(articles)に下書き記事を投稿。
-// 2.記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
-// 記事IDとカテゴリーIDを投稿するAPI
-router.use('/draft', require('./draft/draft.js'));
-
-router.get('/category', async (req, res, next) => {
-  try {
-    const query = await promisifyReadFile(`${categoryURL}/SELECT_CATEGORY.sql`);
-    const category = await mysqlAPI.query(query);
-    res.json(category);
-  } catch (err) {
     next(err);
   }
 });
