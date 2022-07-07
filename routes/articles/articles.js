@@ -23,7 +23,7 @@ router.use('/draft', require('./draft/draft.js'));
 // カテゴリーデータベース(category)からカテゴリー一覧全て取得するAPI
 router.use('/category', require('./category/category.js'));
 
-// 1. 記事データベース(articles)から、URLパラメータから取得した記事IDを元に
+// 1. 記事データベース(articles)で、URLパラメータから取得した記事IDを元に
 //    ユーザーの下書き記事データを取得する
 // 2. 記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
 //    URLパラメータから取得した記事IDを元に、登録されているカテゴリーIDを取得するAPI
@@ -45,6 +45,20 @@ router.get('/:id/draft', async (req, res, next) => {
     );
     const categories = await mysqlAPI.query(query, [articleId]);
     res.json({ data, categories });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 記事データベース(articles)で、URLパラメータから取得した記事IDを元に
+// ユーザーの下書きデータを更新する。
+router.put('/:id/draft', async (req, res, next) => {
+  const articleId = Number(req.params.id);
+
+  try {
+    const query = promisifyReadFile(
+      `${articlesURL}/UPDATE_ARTICLES_BY_ARTICLE_ID.sql`
+    );
   } catch (err) {
     next(err);
   }

@@ -19,6 +19,9 @@ router.post('/', async (req, res, next) => {
     letterBody: req.body.letter_body,
     createdAt: req.body.created_at,
     public: req.body.public,
+    articleIdOfStorage: req.body.articleIdOfStorage,
+    fileNames: req.body.fileNames,
+    imagesUrl: req.body.imagesUrl,
   };
   const categories = req.body.category;
 
@@ -33,6 +36,9 @@ router.post('/', async (req, res, next) => {
       data.letterBody,
       data.createdAt,
       data.public,
+      data.articleIdOfStorage,
+      data.fileNames,
+      data.imagesUrl,
     ]);
     query = await promisifyReadFile(
       `${articlesURL}/SELECT_ARTICLES_LATEST_ID.sql`

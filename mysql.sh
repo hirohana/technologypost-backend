@@ -10,7 +10,8 @@ VALUES("Dummy", "dummy@gmail.com","$2b$10$Etc2SKDOWqaGiT61eB6f7OWzqN1ll3iLKzerfo
 # articlesのテーブル作成
 CREATE TABLE articles(id int not null auto_increment primary key, user_id int not null,
 title varchar(32) not null, letter_body text not null, photo_url varchar(255), 
-created_at datetime not null, public tinyint not null);
+created_at datetime not null, public tinyint not null, article_id_of_storage varchar(255), 
+file_names text, images_url text);
 # articlesのデータ挿入
 INSERT INTO articles(user_id, title, letter_body, photo_url, created_at, public) 
   VALUES
