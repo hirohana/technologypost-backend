@@ -5,7 +5,6 @@ const { public_state } = require('../../config/application.config.js');
 
 const articlesURL = './lib/database/sql/articles';
 const articles_commentsURL = './lib/database/sql/articles_comments';
-const articles_categoryURL = './lib/database/sql/articles_category';
 
 // 1. 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
 // 2. 投稿記事のデータベース(articles)から記事を作成日付順で取得するAPIを記述。
@@ -15,54 +14,10 @@ router.use('/page', require('./page/page.js'));
 // クエリパラメータの値が指定されていなければ最新の記事から取得。
 router.use('/search', require('./search/search.js'));
 
-// 1.記事データベース(articles)に下書き記事を投稿。
-// 2.記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
-// 記事IDとカテゴリーIDを投稿するAPI
 router.use('/draft', require('./draft/draft.js'));
 
 // カテゴリーデータベース(category)からカテゴリー一覧全て取得するAPI
 router.use('/category', require('./category/category.js'));
-
-// 1. 記事データベース(articles)で、URLパラメータから取得した記事IDを元に
-//    ユーザーの下書き記事データを取得する
-// 2. 記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
-//    URLパラメータから取得した記事IDを元に、登録されているカテゴリーIDを取得するAPI
-router.get('/:id/draft', async (req, res, next) => {
-  if (req.params.id === 'undefined') {
-    res.json({ message: '下書きデータが存在しません。' });
-    return;
-  }
-  const articleId = Number(req.params.id);
-  let query;
-
-  try {
-    query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_DRAFT_DATA_BY_ARTICLE_ID.sql`
-    );
-    const data = await mysqlAPI.query(query, [articleId]);
-    query = await promisifyReadFile(
-      `${articles_categoryURL}/SELECT_ARTICLES_CATEGORY_BY_ARTICLE_ID.sql`
-    );
-    const categories = await mysqlAPI.query(query, [articleId]);
-    res.json({ data, categories });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// 記事データベース(articles)で、URLパラメータから取得した記事IDを元に
-// ユーザーの下書きデータを更新する。
-router.put('/:id/draft', async (req, res, next) => {
-  const articleId = Number(req.params.id);
-
-  try {
-    const query = promisifyReadFile(
-      `${articlesURL}/UPDATE_ARTICLES_BY_ARTICLE_ID.sql`
-    );
-  } catch (err) {
-    next(err);
-  }
-});
 
 // 記事の状態(public)を公開(tinyintが1)、非公開(tinyintが0)に変更するAPI
 router.put('/:id/:public', async (req, res, next) => {
