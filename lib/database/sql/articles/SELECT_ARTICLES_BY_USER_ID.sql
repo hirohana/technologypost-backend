@@ -7,7 +7,8 @@ SELECT
   a.letter_body,
   a.photo_url AS article_photo_url,
   a.created_at,
-  a.public
+  a.public,
+  a.article_id_of_storage
 FROM
   articles AS a
 LEFT OUTER JOIN

@@ -7,7 +7,7 @@ const { MAX_ITEMS_PER_PAGE } =
   require('../../../config/application.config.js').search;
 const articlesURL = './lib/database/sql/articles';
 
-// 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
+// ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
 router.get('/:page/users/:id', async (req, res, next) => {
   const page = Number(req.params.page) || 1;
   const userId = Number(req.params.id);
