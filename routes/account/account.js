@@ -6,6 +6,28 @@ const { authentication } = require('../../lib/security/authPassport');
 const { createHashPassword } = require('../../lib/utils/hashPassword.js');
 const mysqlAPI = require('../../lib/database/mysqlAPI');
 
+// ユーザーのプロフィールURL更新処理
+router.put('/user/photo_url', async (req, res, next) => {
+  const bodyData = {
+    photoUrl: req.body.photoUrl,
+    id: req.body.userId,
+  };
+  let transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    const query = await promisifyReadFile(
+      `./lib/database/sql/users/UPDATE_USERS_PROFILE_URL.sql`
+    );
+    await transaction.query(query, [bodyData.photoUrl, bodyData.id]);
+    transaction.commit();
+    res.json({ message: 'ユーザープロフィール情報が更新されました。' });
+  } catch (err) {
+    transaction.rollback();
+    next(err);
+  }
+});
+
 // ログイン認証が成功した際のリダイレクト先
 router.get('/login/success', (req, res, next) => {
   res
@@ -44,6 +66,7 @@ router.post('/logout', (req, res, next) => {
   });
 });
 
+// 新規アカウント登録処理
 router.post('/signup', async (req, res, next) => {
   const { now } = jstNow();
   const hashPassword = await createHashPassword(req.body.password);
@@ -73,6 +96,27 @@ router.post('/signup', async (req, res, next) => {
     res.json({ message: 'アカウント登録に成功しました' });
   } catch (err) {
     transaction.rollback();
+    next(err);
+  }
+});
+
+// アカウント削除
+router.delete('/', async (req, res, next) => {
+  const bodyData = {
+    id: req.body.userId,
+  };
+  let transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    const query = await promisifyReadFile(
+      `./lib/database/sql/users/DELETE_USERS_BY_ID.sql`
+    );
+    await transaction.query(query, [bodyData.id]);
+    await transaction.commit();
+    res.json({ message: 'データベースからアカウントが削除されました。' });
+  } catch (err) {
+    await transaction.rollback();
     next(err);
   }
 });
