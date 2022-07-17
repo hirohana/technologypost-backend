@@ -20,10 +20,13 @@ router.put('/user/photo_url', async (req, res, next) => {
       `./lib/database/sql/users/UPDATE_USERS_PROFILE_URL.sql`
     );
     await transaction.query(query, [bodyData.photoUrl, bodyData.id]);
-    transaction.commit();
-    res.json({ message: 'ユーザープロフィール情報が更新されました。' });
+    await transaction.commit();
+    res.json({
+      message:
+        'ユーザープロフィール情報が更新されました。\n更新を反映するには再ログインお願いいたします。',
+    });
   } catch (err) {
-    transaction.rollback();
+    await transaction.rollback();
     next(err);
   }
 });
@@ -92,10 +95,13 @@ router.post('/signup', async (req, res, next) => {
       bodyData.photoUrl,
       bodyData.createdAt,
     ]);
-    transaction.commit();
-    res.json({ message: 'アカウント登録に成功しました' });
+    await transaction.commit();
+    res.json({
+      message:
+        'アカウント登録に成功しました。\n登録処理を反映するには、一度ログイン認証をお願いします。',
+    });
   } catch (err) {
-    transaction.rollback();
+    await transaction.rollback();
     next(err);
   }
 });
@@ -114,7 +120,7 @@ router.delete('/', async (req, res, next) => {
     );
     await transaction.query(query, [bodyData.id]);
     await transaction.commit();
-    res.json({ message: 'データベースからアカウントが削除されました。' });
+    res.json({ message: 'アカウントが削除されました。' });
   } catch (err) {
     await transaction.rollback();
     next(err);

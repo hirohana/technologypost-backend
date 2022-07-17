@@ -1,7 +1,11 @@
+# database myportfolio作成
+CREATE DATABASE myportfolio;
+use myportfolio;
+
 # usersのテーブル作成
 CREATE TABLE users(id int not null auto_increment primary key, 
 username varchar(32) not null, email varchar(64) not null, password varchar(255) not null, 
-profile varchar(255), photo_url varchar(255) not null, created_at datetime not null, lock_status datetime);
+profile varchar(255), photo_url text not null, created_at datetime not null, lock_status datetime);
 # usersのデータ挿入
 INSERT INTO users(username, email, password, profile, photo_url, created_at)
 VALUES("Dummy", "dummy@gmail.com","$2b$10$Etc2SKDOWqaGiT61eB6f7OWzqN1ll3iLKzerfozF1dbPjIdT09eSq", "初めまして!", 
