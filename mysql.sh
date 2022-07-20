@@ -74,7 +74,7 @@ INSERT INTO category(name)
   ("Java"),
   ("SQL"),
   ("MySQL"),
-  ("MONGO"),
+  ("Mongo"),
   ("Git"),
   ("GitHub"),
   ("Docker"),
