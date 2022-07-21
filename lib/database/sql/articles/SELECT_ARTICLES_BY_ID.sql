@@ -1,12 +1,14 @@
 SELECT
   a.id AS article_id,
   a.user_id,
-  u.username,
-  u.photo_url AS user_photo_url,
   a.title,
   a.letter_body,
-  a.photo_url AS article_photo_url,
   a.created_at,
+  a.article_id_storage,
+  a.file_names,
+  a.images_url,
+  u.username,
+  u.photo_url AS user_photo_url,
   GROUP_CONCAT(c.name separator ",") AS category_name
 FROM
   articles AS a

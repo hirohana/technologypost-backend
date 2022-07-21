@@ -5,7 +5,7 @@ SET
   letter_body = ?,
   created_at = ?,
   public = ?,
-  article_id_of_storage = ?,
+  article_id_storage = ?,
   file_names = ?,
   images_url = ?
 WHERE

@@ -16,6 +16,8 @@ CREATE TABLE articles(id int not null auto_increment primary key, user_id int no
 title varchar(32) not null, letter_body text not null, created_at datetime not null, 
 public tinyint not null, article_id_storage varchar(255), file_names text, images_url text);
 # articlesのデータ挿入
+INSERT INTO articles(user_id, title, letter_body, created_at, public, article_id_storage, file_names, images_url)
+  VALUES(1, "テスト", "テスト", "2022-07-22 00:00:00", 1, "", "", "");
 
 # users_login_historyのテーブル作成
 CREATE TABLE users_login_history(id int not null auto_increment primary key, user_id int not null, 

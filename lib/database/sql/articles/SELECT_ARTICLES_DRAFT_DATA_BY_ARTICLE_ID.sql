@@ -4,7 +4,7 @@ SELECT
   draft_article.letter_body,
   draft_article.created_at AS created_at,
   draft_article.user_id,
-  draft_article.article_id_of_storage,
+  draft_article.article_id_storage,
   draft_article.file_names,
   draft_article.images_url,
   users.username
