@@ -14,6 +14,7 @@ router.use('/page', require('./page/page.js'));
 // クエリパラメータの値が指定されていなければ最新の記事から取得。
 router.use('/search', require('./search/search.js'));
 
+// ユーザーの下書きデータに関するAPI
 router.use('/draft', require('./draft/draft.js'));
 
 // カテゴリーデータベース(category)からカテゴリー一覧全て取得するAPI
