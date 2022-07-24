@@ -86,17 +86,6 @@ INSERT INTO category(name)
 # articles_categoryテーブルの作成
 CREATE TABLE articles_category(id int not null auto_increment primary key, 
 articles_id int not null, category_id int not null);
-# articles_categoryテーブルにデータ挿入
-INSERT INTO articles_category(articles_id, category_id)
-  VALUES
-  (1, 8),
-  (1, 9),
-  (1, 10),
-  (1, 14),
-  (1, 19),
-  (3, 8),
-  (3, 9),
-  (3, 12);
 
 # articles_commentsテーブルの作成
 CREATE TABLE articles_comments(id int not null auto_increment primary key, articles_id int not null, 

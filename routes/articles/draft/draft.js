@@ -3,6 +3,7 @@ const mysqlAPI = require('../../../lib/database/mysqlAPI');
 const {
   promisifyReadFile,
 } = require('../../../lib/utils/promisifyReadFile.js');
+const { jstNow } = require('../../../lib/utils/jstNow');
 
 const articlesURL = './lib/database/sql/articles';
 const articles_categoryURL = './lib/database/sql/articles_category';
@@ -104,6 +105,11 @@ router.put('/:id', async (req, res, next) => {
   // articlesとcategoryの中間テーブルarticles_categoryにカテゴリーをinsertする関数
   // 動的SQL文を作っている。
   const updateArticlesCategory = async () => {
+    // categories配列のidが空だった場合処理をしない。
+    // fireStorageにファイル画像を送信した場合に、categoryに値がセットされていなかった場合の為の分岐処理。
+    if (!categories[0].id) {
+      return;
+    }
     let query;
     query = await promisifyReadFile(
       `${articles_categoryURL}/DELETE_ARTICLES_CATEGORY_BY_ARTICLE_ID.sql`
@@ -141,63 +147,50 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// 1.記事データベース(articles)に下書き記事を投稿。
-// 2.記事データベース(articles)とカテゴリーテーブル(category)の中間テーブル(articles_category)に
-// 記事IDとカテゴリーIDを投稿するAPI。動的にSQLクエリを作成するAPI。
+// 新規記事作成画面をユーザーが押した際に、
+// 1. 最新の記事idを取得してロックをかけ、idに対してインクリメント。
+// 2. 空の下書きデータを作成し、articlesに挿入。
 router.post('/', async (req, res, next) => {
+  const userId = req.body.userId;
   let transaction, query;
-  const data = {
-    userId: req.body.userId,
-    title: req.body.title,
-    letterBody: req.body.letterBody,
-    createdAt: req.body.createdAt,
-    public: req.body.public,
-    articleIdOfStorage: req.body.articleIdOfStorage,
-    fileNames: req.body.fileNames,
-    imagesUrl: req.body.imagesUrl,
-  };
-  const categories = req.body.category;
-
   try {
     transaction = await mysqlAPI.beginTransaction();
     query = await promisifyReadFile(
-      `${articlesURL}/INSERT_ARTICLES_DRAFT_DATA.sql`
+      `${articlesURL}/SELECT_ARTICLES_LATEST_ID_FOR_UPDATE.sql`
+    );
+    const objId = await transaction.query(query);
+    const latestId = objId[0].id + 1;
+    const { now } = jstNow();
+
+    const initialData = {
+      id: Number(latestId),
+      userId,
+      title: '',
+      letterBody: '',
+      createdAt: now,
+      public: 0,
+      articleIdOfStorage: '',
+      fileNames: '',
+      imagesUrl: '',
+    };
+
+    query = await promisifyReadFile(
+      `${articlesURL}/INSERT_ARTICLES_INITIAL_DRAFT_DATA.sql`
     );
     await transaction.query(query, [
-      data.userId,
-      data.title,
-      data.letterBody,
-      data.createdAt,
-      data.public,
-      data.articleIdOfStorage,
-      data.fileNames,
-      data.imagesUrl,
+      initialData.id,
+      initialData.userId,
+      initialData.title,
+      initialData.letterBody,
+      initialData.createdAt,
+      initialData.public,
+      initialData.articleIdOfStorage,
+      initialData.fileNames,
+      initialData.imagesUrl,
     ]);
-    query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_LATEST_ID.sql`
-    );
-    const latestId = await transaction.query(query);
 
-    let queryInsertArticlesCategory = insertArticles_categorySQL;
-    let parametaArticlesCategory = [];
-    for (let i = 0; i < categories.length; i++) {
-      if (i === 0) {
-        queryInsertArticlesCategory += `VALUES(?, ?)`;
-        parametaArticlesCategory.push(latestId[0].id);
-        parametaArticlesCategory.push(Number(categories[i].id));
-      } else {
-        queryInsertArticlesCategory += `, (?, ?)`;
-        parametaArticlesCategory.push(latestId[0].id);
-        parametaArticlesCategory.push(Number(categories[i].id));
-      }
-    }
-
-    await transaction.query(
-      queryInsertArticlesCategory,
-      parametaArticlesCategory
-    );
     await transaction.commit();
-    res.status(200).end();
+    res.json({ id: initialData.id });
   } catch (err) {
     await transaction.rollback();
     next(err);
