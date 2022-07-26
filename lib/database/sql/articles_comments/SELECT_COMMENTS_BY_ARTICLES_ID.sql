@@ -8,6 +8,6 @@ FROM
   INNER JOIN
     users AS u
   ON ac.user_id = u.id
-WHERE ac.articles_id = ?
+WHERE ac.article_id = ?
 ORDER BY ac.created_at ASC
 
