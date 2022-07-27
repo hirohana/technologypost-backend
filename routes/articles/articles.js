@@ -8,6 +8,10 @@ const articlesURL = './lib/database/sql/articles';
 const articles_commentsURL = './lib/database/sql/articles_comments';
 const articles_category = './lib/database/sql/articles_category';
 
+// twitterとfacebookのOGPタグを生成するAPI
+router.post('/article/:id', async (req, res, next) => {
+  const bodyData = {};
+});
 // 記事のコメントを挿入するAPI
 router.post('/comments', async (req, res, next) => {
   const { now } = jstNow();
