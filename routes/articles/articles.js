@@ -38,6 +38,28 @@ router.post('/comments', async (req, res, next) => {
   }
 });
 
+// 記事のコメントを削除するAPI
+router.delete('/comments/:id', async (req, res, next) => {
+  const bodyData = {
+    commentId: Number(req.params.id),
+    comment: 'このコメントは投稿者により削除されました。',
+  };
+  let transaction;
+
+  try {
+    transaction = await mysqlAPI.beginTransaction();
+    const query = await promisifyReadFile(
+      `${articles_commentsURL}/DELETE_ARTICLES_COMMENTS_BY_ID.sql`
+    );
+    transaction.query(query, [bodyData.comment, bodyData.commentId]);
+    await transaction.commit();
+    res.end();
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
+  }
+});
+
 // 1. 該当ユーザーの公開記事をデータベース(articles)から作成日付順に取得するAPI
 // 2. 投稿記事のデータベース(articles)から記事を作成日付順で取得するAPIを記述。
 router.use('/page', require('./page/page.js'));

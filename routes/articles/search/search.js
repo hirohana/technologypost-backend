@@ -32,7 +32,7 @@ FROM
       ON a.user_id = u.id
       LEFT OUTER JOIN
         articles_comments AS aco
-      ON a.id = aco.articles_id
+      ON a.id = aco.article_id
 GROUP BY a.id
 `;
 
