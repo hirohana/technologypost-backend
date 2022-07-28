@@ -3,15 +3,34 @@ const mysqlAPI = require('../../lib/database/mysqlAPI');
 const { promisifyReadFile } = require('../../lib/utils/promisifyReadFile.js');
 const { public_state } = require('../../config/application.config.js');
 const { jstNow } = require('../../lib/utils/jstNow');
+const { createOgp } = require('../../lib/utils/createOgp');
 
 const articlesURL = './lib/database/sql/articles';
 const articles_commentsURL = './lib/database/sql/articles_comments';
 const articles_category = './lib/database/sql/articles_category';
 
 // twitterとfacebookのOGPタグを生成するAPI
-router.post('/article/:id', async (req, res, next) => {
-  const bodyData = {};
+router.post('/article/ogp/:id', async (req, res, next) => {
+  const bodyData = {
+    articleId: Number(req.params.id),
+    userName: req.body.userName,
+    title: req.body.title,
+    imageUrl: req.body.imageUrl,
+    siteUrl: req.body.siteUrl,
+  };
+
+  res
+    .status(200)
+    .send(
+      createOgp(
+        bodyData.userName,
+        bodyData.title,
+        bodyData.imageUrl,
+        bodyData.siteUrl
+      )
+    );
 });
+
 // 記事のコメントを挿入するAPI
 router.post('/comments', async (req, res, next) => {
   const { now } = jstNow();
