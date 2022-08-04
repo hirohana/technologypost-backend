@@ -44,6 +44,9 @@ app.use(
     });
     router.use('/api/v1/account', require('./routes/account/account.js'));
     router.use('/api/v1/articles', require('./routes/articles/articles.js'));
+    router.use('/', (req, res) => {
+      res.json('Hello World!');
+    });
     return router;
   })()
 );
