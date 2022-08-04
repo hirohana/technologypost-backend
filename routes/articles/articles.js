@@ -165,7 +165,7 @@ router.delete('/:id', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
   try {
     const query = await promisifyReadFile(
-      `${articlesURL}/SELECT_ARTICLES_LATEST_ID.sql`
+      `${articlesURL}/SELECT_ARTICLES_LATEST_ID_FOR_UPDATE.sql`
     );
     const data = await mysqlAPI.query(query);
     res.json({ id: ++data[0].id });
