@@ -1,5 +1,5 @@
 # Heroku-Deploy-Environment
-Node.js(Express)を使用しした開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
+Node.js(Express)を使用した開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
 
 ## Herokuへのデプロイ手順
 1. ローカル開発環境で【npm start】でローカル環境を立ち上げてエラーが出ないことを確認。front側からAPI接続も確認。
