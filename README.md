@@ -1,5 +1,5 @@
 # Heroku-Deploy-Environment
-Node.js(Express)を使用ししたDocker開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
+Node.js(Express)を使用しした開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
 
 ## Herokuへのデプロイ手順
 ※HerokuへのDockerを使用したデプロイには2種類のやり方があり、下記の手順は↓URLのやり方をアレンジしたものhttps://devcenter.heroku.com/ja/articles/build-docker-images-heroku-yml
