@@ -11,10 +11,10 @@ Node.js(Express)を使用しした開発環境。MySQL8.0実装。Herokuへの�
 - 【git push heroku ブランチ名:master】でHerokuにデプロイを行う。
 
 ※ それ以外のコマンドについて。
-1. 【heroku apps】で現在のHerokuにデプロイされているアプリのリソース名を取得
-2. 【heroku destroy --app <リソース名> --confirm <リソース名>】でアプリの削除。
-3. 【heroku logs --tail】で現在のHerokuに公開されているアプリのログを確認する。デプロイの際のエラーチェックにも使用。
-4. 【heroku open】で現在公開されているアプリをブラウザが立ち上がる。
+- 【heroku apps】で現在のHerokuにデプロイされているアプリのリソース名を取得
+- 【heroku destroy --app <リソース名> --confirm <リソース名>】でアプリの削除。
+- 【heroku logs --tail】で現在のHerokuに公開されているアプリのログを確認する。デプロイの際のエラーチェックにも使用。
+- 【heroku open】で現在公開されているアプリをブラウザが立ち上がる。
 
 ## Webサイトの改善点
 1. 文字列入力から記事検索をする際に、現在のコードではOR検索のロジックになっているが、AND検索へ変更したい。
