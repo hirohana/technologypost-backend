@@ -13,14 +13,14 @@ const app = express();
 //set middleware
 app.set('view engine', 'ejs');
 app.disable('x-powered-by');
-// 現在だれでもアクセスできる状態になってるのでデプロイ時には設定変更(引数にオプション)が必要
 app.use(cors({ origin: applicationConfig.FRONTEND_URL, credentials: true }));
 app.use(cookie());
 app.use(
   session({
     cookie: {
       httpOnly: true,
-      secure: false, // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
+      // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
+      secure: applicationConfig.prodEnviroment ? true : false,
       maxage: 1000 * 60 * 30,
     },
     secret: 'secret',
