@@ -2,10 +2,9 @@
 Node.js(Express)を使用しした開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
 
 ## Herokuへのデプロイ手順
-※HerokuへのDockerを使用したデプロイには2種類のやり方があり、下記の手順は↓URLのやり方をアレンジしたものhttps://devcenter.heroku.com/ja/articles/build-docker-images-heroku-yml
-- Dockerを使用したローカル開発環境で【docker-compose up --build】、【docker-compose exec app bash】、【yarn install】、【npm start】でローカル環境を立ち上げてエラーが出ないことを確認。
-- 【git add .】、【git commit -m "コミットのコメント"】でローカルリポジトリにコミットする。※Herokuへデプロイする際はGithubのリモート環境にpushしなくても良い。
-- WindowsのPowerShellを立ち上げ、【heroku login】【heroku container:login】を入力してHerokuにCLIを使ってログインし、【heroku create】でHerokuのリポジトリを作成。
+1. ローカル開発環境で【npm start】でローカル環境を立ち上げてエラーが出ないことを確認。front側からAPI接続も確認。
+2.【git add .】、【git commit】でローカルリポジトリにコミットする。※Herokuへデプロイする際はGithubにpushしなくても良い。
+3. WindowsのPowerShellを立ち上げ、【heroku login】【heroku container:login】を入力してHerokuにCLIを使ってログインし、【heroku create】でHerokuのリポジトリを作成。
 - 共有MySQLアドオンの下記の手順に従ってプロビジョニングを行う。詳細なやり方については→https://devcenter.heroku.com/articles/cleardb#provisioning-the-shared-mysql-add-on
 【heroku addons:create cleardb:ignite】、【heroku config | grep CLEARDB_DATABASE_URL】でCLEARDB_DATABASE_URLの値をターミナルで取得し、【heroku config:set DATABASE_URL='CLEARDB_DATABASE_URL'】として代入。
 - 【git push heroku ブランチ名:master】でHerokuにデプロイを行う。
