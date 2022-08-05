@@ -2,8 +2,8 @@
 Node.js(Express)を使用した開発環境。MySQL8.0実装。Herokuへのデプロイを想定。
 
 ## Herokuへのデプロイ手順
-1. ローカル開発環境で【npm start】でローカル環境を立ち上げてエラーが出ないことを確認。front側からAPI接続も確認
-1.【git add .】、【git commit】でローカルリポジトリにコミットする。※Herokuへデプロイする際はGithubにpushしなくても良い。
+1. ローカル開発環境で【npm start】でローカル環境を立ち上げてエラーが出ないことを確認。front側からAPI接続も確認。
+2. 2.【git add .】、【git commit】でローカルリポジトリにコミットする。※Herokuへデプロイする際はGithubにpushしなくても良い。
 3. WindowsのPowerShellを立ち上げ、【heroku login】【heroku container:login】を入力してHerokuにCLIを使ってログインし、【heroku create】でHerokuのリポジトリを作成。
 - 共有MySQLアドオンの下記の手順に従ってプロビジョニングを行う。詳細なやり方については→https://devcenter.heroku.com/articles/cleardb#provisioning-the-shared-mysql-add-on
 【heroku addons:create cleardb:ignite】、【heroku config | grep CLEARDB_DATABASE_URL】でCLEARDB_DATABASE_URLの値をターミナルで取得し、【heroku config:set DATABASE_URL='CLEARDB_DATABASE_URL'】として代入。
