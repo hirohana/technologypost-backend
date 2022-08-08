@@ -20,7 +20,7 @@ app.use(
     cookie: {
       httpOnly: true,
       // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
-      secure: applicationConfig.prodEnviroment ? true : false,
+      secure: false,
       maxage: 1000 * 60 * 30,
     },
     secret: 'secret',
