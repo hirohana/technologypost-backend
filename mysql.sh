@@ -89,11 +89,11 @@ articles_id int not null, category_id int not null);
 # articles_commentsテーブルの作成
 CREATE TABLE articles_comments(id int not null auto_increment primary key, article_id int not null, 
 user_id int not null, comment text not null, created_at datetime not null);
-# # articles_commentsテーブルにデータ挿入
-# INSERT INTO articles_comments(article_id, user_id, comment, created_at)
-#   VALUES
-#   (1, 1, "コメントありがとう!", "2022-06-14 21:00:00"),
-#   (1, 1, "2回目コメントありがとう!", "2022-06-14 22:00:00");
+# articles_commentsテーブルにデータ挿入
+INSERT INTO articles_comments(article_id, user_id, comment, created_at)
+  VALUES
+  (1, 1, "コメントありがとう!", "2022-06-14 21:00:00"),
+  (1, 1, "2回目コメントありがとう!", "2022-06-14 22:00:00");
 
 # # draftArticlesのテーブル作成
 # CREATE TABLE draft_articles(id int not null auto_increment primary key, user_id int not null,

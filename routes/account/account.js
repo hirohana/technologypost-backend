@@ -1,13 +1,16 @@
-const router = require('express').Router();
+const router = require("express").Router();
 
-const { promisifyReadFile } = require('../../lib/utils/promisifyReadFile.js');
-const { jstNow } = require('../../lib/utils/jstNow.js');
-const { authentication } = require('../../lib/security/authPassport');
-const { createHashPassword } = require('../../lib/utils/hashPassword.js');
-const mysqlAPI = require('../../lib/database/mysqlAPI');
+const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
+const { jstNow } = require("../../lib/utils/jstNow.js");
+const { createHashPassword } = require("../../lib/utils/hashPassword.js");
+const {
+  createToken,
+  verifyToken,
+} = require("../../lib/security/jwt/JwtHelper.js");
+const mysqlAPI = require("../../lib/database/mysqlAPI");
 
 // ユーザーのプロフィールURL更新処理
-router.put('/user/photo_url', async (req, res, next) => {
+router.put("/user/photo_url", async (req, res, next) => {
   const bodyData = {
     photoUrl: req.body.photoUrl,
     id: req.body.userId,
@@ -23,7 +26,7 @@ router.put('/user/photo_url', async (req, res, next) => {
     await transaction.commit();
     res.json({
       message:
-        'ユーザープロフィール情報が更新されました。\n更新を反映するには再ログインお願いいたします。',
+        "ユーザープロフィール情報が更新されました。\n更新を反映するには再ログインお願いいたします。",
     });
   } catch (err) {
     await transaction.rollback();
@@ -31,46 +34,21 @@ router.put('/user/photo_url', async (req, res, next) => {
   }
 });
 
-// ログイン認証が成功した際のリダイレクト先
-router.get('/login/success', (req, res, next) => {
-  res
-    .status(200)
-    .json({ user: req.user, message: 'ログイン処理に成功しました。' });
-});
-
-// ログイン認証が失敗した際のリダイレクト先
-router.get('/login/failure', (req, res, next) => {
-  switch (req.flash('message')[0]) {
-    case 'Emailまたはパスワードが間違っています。':
-      return res
-        .status(401)
-        .json({ message: 'Emailまたはパスワードが間違っています。' });
-    case `現在アカウントがロックされています。しばらくしたら再度ログイン認証をお試しください。`:
-      return res.status(403).json({
-        message: `現在アカウントがロックされています。しばらくしたら再度ログイン認証をお試しください。`,
-      });
-    default:
-      return res
-        .status(500)
-        .json({ message: 'サーバ側にエラーが発生しています。' });
-  }
-});
-
-// ログイン認証処理(passportライブラリを使用)
-router.post('/login', authentication());
+// ログイン認証処理
+router.post("/login", (req, res, next) => {});
 
 // ログアウト処理
-router.post('/logout', (req, res, next) => {
+router.post("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) {
-      res.status(500).json('ログアウト処理に失敗しました。');
+      res.status(500).json("ログアウト処理に失敗しました。");
     }
-    res.status(200).json('ログアウトしました。');
+    res.status(200).json("ログアウトしました。");
   });
 });
 
 // 新規アカウント登録処理
-router.post('/signup', async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   const { now } = jstNow();
   const hashPassword = await createHashPassword(req.body.password);
   const bodyData = {
@@ -98,7 +76,7 @@ router.post('/signup', async (req, res, next) => {
     await transaction.commit();
     res.json({
       message:
-        'アカウント登録に成功しました。\n登録処理を反映するには、一度ログイン認証をお願いします。',
+        "アカウント登録に成功しました。\n登録処理を反映するには、一度ログイン認証をお願いします。",
     });
   } catch (err) {
     await transaction.rollback();
@@ -107,7 +85,7 @@ router.post('/signup', async (req, res, next) => {
 });
 
 // アカウント削除
-router.delete('/', async (req, res, next) => {
+router.delete("/", async (req, res, next) => {
   const bodyData = {
     id: req.body.userId,
   };
@@ -120,7 +98,7 @@ router.delete('/', async (req, res, next) => {
     );
     await transaction.query(query, [bodyData.id]);
     await transaction.commit();
-    res.json({ message: 'アカウントが削除されました。' });
+    res.json({ message: "アカウントが削除されました。" });
   } catch (err) {
     await transaction.rollback();
     next(err);
