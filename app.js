@@ -10,6 +10,9 @@ const accesscontrol = require("./lib/security/passport/authPassport.js");
 const { port } = require("./config/application.config.js");
 const app = express();
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 //set middleware
 app.set("view engine", "ejs");
 app.disable("x-powered-by");
