@@ -4,10 +4,11 @@ const {
   promisifyReadFile,
 } = require("../../../lib/utils/promisifyReadFile.js");
 const { jstNow } = require("../../../lib/utils/jstNow.js");
-const { nowPlus1Hour } = require("../../../lib/utils/nowPlus1Hour");
 const { createHashPassword } = require("../../../lib/utils/hashPassword.js");
-const { createToken } = require("../../../lib/security/jwt/JwtHelper.js");
 const mysqlAPI = require("../../../lib/database/mysqlAPI");
+const {
+  setJwtToCookie,
+} = require("../../../lib/security/jwt/setJwtToCookie.js");
 
 router.post("/", async (req, res, next) => {
   const { now } = jstNow();
@@ -35,17 +36,8 @@ router.post("/", async (req, res, next) => {
       bodyData.createdAt,
     ]);
 
-    // jwtトークン作成
-    const payload = {
-      email: bodyData.email,
-      password: bodyData.password,
-    };
-    const jwtToken = createToken(payload);
-    const { time } = nowPlus1Hour();
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      expires: time,
-    });
+    // jwtトークン作成、保存
+    setJwtToCookie(bodyData.email, bodyData.password, res);
 
     res.json({
       message:

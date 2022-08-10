@@ -4,9 +4,10 @@ const { promisifyReadFile } = require("../../lib/utils/promisifyReadFile.js");
 const login = require("./login/login.js");
 const signup = require("./signup/signup.js");
 const mysqlAPI = require("../../lib/database/mysqlAPI");
+const { authToken } = require("../../lib/security/jwt/JwtHelper.js");
 
 // ユーザーのプロフィールURL更新処理
-router.put("/user/photo_url", async (req, res, next) => {
+router.put("/user/photo_url", authToken, async (req, res, next) => {
   const bodyData = {
     photoUrl: req.body.photoUrl,
     id: req.body.userId,
@@ -47,10 +48,7 @@ router.post("/logout", (req, res, next) => {
 });
 
 // アカウント削除
-router.delete("/", async (req, res, next) => {
-  const bodyData = {
-    id: req.body.userId,
-  };
+router.delete("/", authToken, async (req, res, next) => {
   let transaction;
 
   try {
@@ -58,7 +56,7 @@ router.delete("/", async (req, res, next) => {
     const query = await promisifyReadFile(
       `./lib/database/sql/users/DELETE_USERS_BY_ID.sql`
     );
-    await transaction.query(query, [bodyData.id]);
+    await transaction.query(query, [res.locals.data[0].id]);
     await transaction.commit();
     res.json({ message: "アカウントが削除されました。" });
   } catch (err) {
