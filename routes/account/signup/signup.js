@@ -4,7 +4,7 @@ const {
   promisifyReadFile,
 } = require("../../../lib/utils/promisifyReadFile.js");
 const { jstNow } = require("../../../lib/utils/jstNow.js");
-const { nowPlus1Hour } = require("../../../lib/utils/jstNowPlus1Hour");
+const { nowPlus1Hour } = require("../../../lib/utils/nowPlus1Hour");
 const { createHashPassword } = require("../../../lib/utils/hashPassword.js");
 const { createToken } = require("../../../lib/security/jwt/JwtHelper.js");
 const mysqlAPI = require("../../../lib/database/mysqlAPI");
