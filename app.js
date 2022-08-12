@@ -23,8 +23,10 @@ app.use(
     cookie: {
       httpOnly: true,
       // 本番環境はtrueにする。cookieを保存するのはhttps限定にするかどうかの設定。
-      secure: false,
+      secure: true,
       maxage: 1000 * 60 * 30,
+      domain: process.env.COOKIE_DOMAIN || "localhost:3000",
+      sameSite: "none",
     },
     secret: "secret",
     resave: false,

@@ -5,6 +5,9 @@ const login = require("./login/login.js");
 const signup = require("./signup/signup.js");
 const mysqlAPI = require("../../lib/database/mysqlAPI");
 const { authToken } = require("../../lib/security/jwt/JwtHelper.js");
+const {
+  deleteJwtFromCookie,
+} = require("../../lib/security/jwt/deleteJwtFromCookie.js");
 
 // ユーザーのプロフィールURL更新処理
 router.put("/user/photo_url", authToken, async (req, res, next) => {
@@ -38,11 +41,12 @@ router.use("/login", login);
 router.use("/signup", signup);
 
 // ログアウト処理
-router.post("/logout", (req, res, next) => {
+router.get("/logout", authToken, (req, res, next) => {
   req.logout((err) => {
     if (err) {
       res.status(500).json("ログアウト処理に失敗しました。");
     }
+    deleteJwtFromCookie(res);
     res.status(200).json("ログアウトしました。");
   });
 });
@@ -58,6 +62,7 @@ router.delete("/", authToken, async (req, res, next) => {
     );
     await transaction.query(query, [res.locals.data[0].id]);
     await transaction.commit();
+    deleteJwtFromCookie(res);
     res.json({ message: "アカウントが削除されました。" });
   } catch (err) {
     await transaction.rollback();

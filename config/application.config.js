@@ -29,6 +29,5 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
   jwtOptions: {
     expiresIn: 3600,
-    algorithm: "HS512",
   },
 };
