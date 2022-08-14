@@ -15,8 +15,8 @@ router.put("/user/photo_url", authToken, async (req, res, next) => {
     photoUrl: req.body.photoUrl,
     id: req.body.userId,
   };
-  let transaction;
 
+  let transaction;
   try {
     transaction = await mysqlAPI.beginTransaction();
     const query = await promisifyReadFile(

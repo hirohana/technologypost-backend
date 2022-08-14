@@ -132,7 +132,7 @@ router.post("/", async (req, res, next) => {
     await transaction.query(query);
 
     // jwtトークン作成、保存
-    setJwtToCookie(email, password, res);
+    setJwtToCookie(email, password, res, req);
 
     // email、password共に一致したユーザーがいた場合に、req.userにその一致したユーザー情報を渡すためのデータ加工
     const user = [

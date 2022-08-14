@@ -37,7 +37,7 @@ router.post("/", async (req, res, next) => {
     ]);
 
     // jwtトークン作成、保存
-    setJwtToCookie(bodyData.email, bodyData.password, res);
+    setJwtToCookie(bodyData.email, bodyData.password, res, req);
 
     res.json({
       message:
