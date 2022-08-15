@@ -9,6 +9,45 @@ const articlesURL = "./lib/database/sql/articles";
 const articles_commentsURL = "./lib/database/sql/articles_comments";
 const articles_category = "./lib/database/sql/articles_category";
 
+// OGPテストコード----------------
+router.get("/article/", (req, res) => {
+  res
+    .status(200)
+    .send(
+      page(
+        `https://www.hirohana-portfolio.com/articles/5`,
+        "Hello World",
+        "こんにちは"
+      )
+    );
+});
+
+function page(fullUrl, title, description) {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <title>${title}</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@sambaiz">
+        <meta name="twitter:title" content="${title}">
+        <meta name="twitter:description" content="${description}">
+        <meta property="og:title" content="${title}">
+        <meta property="og:type" content="blog">
+        <meta property="og:image" content="http://d2wgaf7ubdj1mv.cloudfront.net/my.jpg">
+        <meta property="og:url" content="${fullUrl}">
+      </head>
+      <body>
+        <div id="app"></div>
+        <script src="/bundle.js"></script>
+      </body>
+    </html>
+    `;
+}
+// ----------------------------------
+
 // twitterとfacebookのOGPタグを生成するAPI
 router.post("/article/ogp/:id", async (req, res, next) => {
   const bodyData = {
@@ -19,7 +58,7 @@ router.post("/article/ogp/:id", async (req, res, next) => {
     siteUrl: req.body.siteUrl,
   };
 
-  res
+  return res
     .status(200)
     .send(
       createOgp(
